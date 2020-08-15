@@ -4,45 +4,53 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   StyleSheet,
+  Alert,
 } from "react-native";
 
 import { Button, Block, Input, Text } from "../components";
 import { theme } from "../constants";
 import { ScrollView } from "react-native-gesture-handler";
-
-const VALID_EMAIL = "contact@react-ui-kit.com";
-const VALID_PASSWORD = "subscribe";
+import { api } from "../services/api";
 
 export default class Login extends Component {
   state = {
-    email: VALID_EMAIL,
-    password: VALID_PASSWORD,
+    login: "",
+    senha: "",
     errors: [],
+    tipo_usuario: "PRESTADOR",
     loading: false,
   };
 
-  handleLogin() {
+  handleLogin = async () => {
     const { navigation } = this.props;
-    const { email, password } = this.state;
-    const errors = [];
+    const { login, senha, tipo_usuario } = this.state;
+    try {
+      this.setState({ loading: true });
 
-    Keyboard.dismiss();
-    this.setState({ loading: true });
+      const response = await api.post("/usuario/token", null, {
+        params: {
+          login: login,
+          senha: senha,
+          tipo_usuario: tipo_usuario,
+        },
+      });
 
-    // check with backend API or with some static data
-    if (email !== VALID_EMAIL) {
-      errors.push("email");
-    }
-    if (password !== VALID_PASSWORD) {
-      errors.push("password");
-    }
+      await AsyncStorage.multiSet([
+        ["@i9App:token", token],
+        ["@i9App:user", JSON.stringify(response.data)],
+      ]);
 
-    this.setState({ errors, loading: false });
+      Keyboard.dismiss();
 
-    if (!errors.length) {
+      this.setState({ loading: false });
+
+      navigation.navigate("Browse");
+    } catch (err) {
+      Alert.alert("ERRO", "Erro ao realizar login");
+      this.setState({ loading: false });
       navigation.navigate("Browse");
     }
-  }
+  };
 
   render() {
     const { navigation } = this.props;
@@ -61,17 +69,17 @@ export default class Login extends Component {
             <Input
               label="Email"
               error={hasErrors("email")}
-              style={[styles.input, hasErrors("email")]}
-              defaultValue={this.state.email}
-              onChangeText={(text) => this.setState({ email: text })}
+              style={[styles.input]}
+              defaultValue={""}
+              onChangeText={(text) => this.setState({ login: text })}
             />
             <Input
               secure
               label="Senha"
               error={hasErrors("password")}
-              style={[styles.input, hasErrors("password")]}
-              defaultValue={this.state.password}
-              onChangeText={(text) => this.setState({ password: text })}
+              style={[styles.input]}
+              defaultValue={""}
+              onChangeText={(text) => this.setState({ senha: text })}
             />
             <Button gradient onPress={() => this.handleLogin()}>
               {loading ? (

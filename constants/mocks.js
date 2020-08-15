@@ -1,46 +1,46 @@
 const categories = [
   {
-    id: "plants",
-    name: "Plants",
-    tags: ["products", "inspirations"],
+    id: "agendamentos",
+    name: "Agendamentos",
+    tags: ["menu"],
     count: 147,
-    image: require("../assets/icons/plants.png")
+    image: require("../assets/icons/agendamentos.png"),
   },
   {
-    id: "seeds",
-    name: "Seeds",
-    tags: ["products", "shop"],
+    id: "servicos",
+    name: "Serviços",
+    tags: ["menu"],
     count: 16,
-    image: require("../assets/icons/seeds.png")
+    image: require("../assets/icons/servicos.png"),
   },
   {
-    id: "flowers",
-    name: "Flowers",
-    tags: ["products", "inspirations"],
+    id: "faturas",
+    name: "Faturamento",
+    tags: ["menu"],
     count: 68,
-    image: require("../assets/icons/flowers.png")
+    image: require("../assets/icons/fatura.png"),
   },
   {
-    id: "sprayers",
-    name: "Sprayers",
-    tags: ["products", "shop"],
+    id: "planos",
+    name: "Plano",
+    tags: ["menu"],
     count: 17,
-    image: require("../assets/icons/sprayers.png")
+    image: require("../assets/icons/planos.png"),
   },
   {
-    id: "pots",
-    name: "Pots",
-    tags: ["products", "shop"],
+    id: "estudo",
+    name: "Estudo",
+    tags: ["menu"],
     count: 47,
-    image: require("../assets/icons/pots.png")
+    image: require("../assets/icons/estudo.png"),
   },
   {
-    id: "fertilizers",
-    name: "fertilizers",
-    tags: ["products", "shop"],
+    id: "ajuda",
+    name: "Ajuda",
+    tags: ["menu"],
     count: 47,
-    image: require("../assets/icons/fertilizers.png")
-  }
+    image: require("../assets/icons/ajuda.png"),
+  },
 ];
 
 const products = [
@@ -60,9 +60,9 @@ const products = [
       require("../assets/images/plants_3.png"),
       require("../assets/images/plants_1.png"),
       require("../assets/images/plants_2.png"),
-      require("../assets/images/plants_3.png")
-    ]
-  }
+      require("../assets/images/plants_3.png"),
+    ],
+  },
 ];
 
 const explore = [
@@ -72,7 +72,7 @@ const explore = [
   require("../assets/images/explore_3.png"),
   require("../assets/images/explore_4.png"),
   require("../assets/images/explore_5.png"),
-  require("../assets/images/explore_6.png")
+  require("../assets/images/explore_6.png"),
 ];
 
 const profile = {
@@ -83,7 +83,7 @@ const profile = {
   budget: 1000,
   monthly_cap: 5000,
   notifications: true,
-  newsletter: false
+  newsletter: false,
 };
 
 export { categories, explore, products, profile };

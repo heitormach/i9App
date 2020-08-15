@@ -4,7 +4,7 @@ import {
   Image,
   StyleSheet,
   ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 
 import { Card, Badge, Button, Block, Text } from "../components";
@@ -15,16 +15,16 @@ const { width } = Dimensions.get("window");
 class Browse extends Component {
   state = {
     active: "Products",
-    categories: []
+    categories: [],
   };
 
   componentDidMount() {
     this.setState({ categories: this.props.categories });
   }
 
-  handleTab = tab => {
+  handleTab = (tab) => {
     const { categories } = this.props;
-    const filtered = categories.filter(category =>
+    const filtered = categories.filter((category) =>
       category.tags.includes(tab.toLowerCase())
     );
 
@@ -51,13 +51,13 @@ class Browse extends Component {
   render() {
     const { profile, navigation } = this.props;
     const { categories } = this.state;
-    const tabs = ["Products", "Inspirations", "Shop"];
+    const tabs = ["Menu", "Dashboard", "Últimos Clientes"];
 
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
           <Text h1 bold>
-            Browse
+            Tela Inicial
           </Text>
           <Button onPress={() => navigation.navigate("Settings")}>
             <Image source={profile.avatar} style={styles.avatar} />
@@ -65,7 +65,7 @@ class Browse extends Component {
         </Block>
 
         <Block flex={false} row style={styles.tabs}>
-          {tabs.map(tab => this.renderTab(tab))}
+          {tabs.map((tab) => this.renderTab(tab))}
         </Block>
 
         <ScrollView
@@ -73,7 +73,7 @@ class Browse extends Component {
           style={{ paddingVertical: theme.sizes.base * 2 }}
         >
           <Block flex={false} row space="between" style={styles.categories}>
-            {categories.map(category => (
+            {categories.map((category) => (
               <TouchableOpacity
                 key={category.name}
                 onPress={() => navigation.navigate("Explore", { category })}
@@ -81,16 +81,13 @@ class Browse extends Component {
                 <Card center middle shadow style={styles.category}>
                   <Badge
                     margin={[0, 0, 15]}
-                    size={50}
-                    color="rgba(41,216,143,0.20)"
+                    size={40}
+                    color="rgba(37, 130, 91, 0.2)"
                   >
                     <Image source={category.image} />
                   </Badge>
                   <Text medium height={20}>
                     {category.name}
-                  </Text>
-                  <Text gray caption>
-                    {category.count} products
                   </Text>
                 </Card>
               </TouchableOpacity>
@@ -104,42 +101,42 @@ class Browse extends Component {
 
 Browse.defaultProps = {
   profile: mocks.profile,
-  categories: mocks.categories
+  categories: mocks.categories,
 };
 
 export default Browse;
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: theme.sizes.base * 2
+    paddingHorizontal: theme.sizes.base * 2,
   },
   avatar: {
     height: theme.sizes.base * 2.2,
-    width: theme.sizes.base * 2.2
+    width: theme.sizes.base * 2.2,
   },
   tabs: {
     borderBottomColor: theme.colors.gray2,
     borderBottomWidth: StyleSheet.hairlineWidth,
     marginVertical: theme.sizes.base,
-    marginHorizontal: theme.sizes.base * 2
+    marginHorizontal: theme.sizes.base * 2,
   },
   tab: {
     marginRight: theme.sizes.base * 2,
-    paddingBottom: theme.sizes.base
+    paddingBottom: theme.sizes.base,
   },
   active: {
     borderBottomColor: theme.colors.secondary,
-    borderBottomWidth: 3
+    borderBottomWidth: 3,
   },
   categories: {
     flexWrap: "wrap",
     paddingHorizontal: theme.sizes.base * 2,
-    marginBottom: theme.sizes.base * 3.5
+    marginBottom: theme.sizes.base * 3.5,
   },
   category: {
     // this should be dynamic based on screen width
     minWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
     maxWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
-    maxHeight: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2
-  }
+    maxHeight: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
+  },
 });
