@@ -3,13 +3,15 @@ const categories = [
     id: "agendamentos",
     name: "Agendamentos",
     tags: ["menu"],
+    screen: "Agendamentos",
     count: 147,
     image: require("../assets/icons/agendamentos.png"),
   },
   {
     id: "servicos",
-    name: "Serviços",
+    name: "Meu Negócio",
     tags: ["menu"],
+    screen: "Servicos",
     count: 16,
     image: require("../assets/icons/servicos.png"),
   },
@@ -17,12 +19,14 @@ const categories = [
     id: "faturas",
     name: "Faturamento",
     tags: ["menu"],
+    screen: "Faturamento",
     count: 68,
     image: require("../assets/icons/fatura.png"),
   },
   {
     id: "planos",
     name: "Plano",
+    screen: "Plano",
     tags: ["menu"],
     count: 17,
     image: require("../assets/icons/planos.png"),
@@ -31,6 +35,7 @@ const categories = [
     id: "estudo",
     name: "Estudo",
     tags: ["menu"],
+    screen: "Estudo",
     count: 47,
     image: require("../assets/icons/estudo.png"),
   },
@@ -38,8 +43,79 @@ const categories = [
     id: "ajuda",
     name: "Ajuda",
     tags: ["menu"],
+    screen: "Ajuda",
     count: 47,
     image: require("../assets/icons/ajuda.png"),
+  },
+];
+
+const servicos = [
+  {
+    id: "contatos",
+    name: "Contatos",
+    tags: ["geral"],
+    screen: "Contatos",
+    count: 147,
+    image: require("../assets/icons/contatos.png"),
+  },
+  {
+    id: "horarios",
+    name: "Horários de Atendimento",
+    tags: ["geral"],
+    screen: "Horarios",
+    count: 16,
+    image: require("../assets/icons/relogio.png"),
+  },
+];
+
+const dayWeek = [
+  {
+    id: "domingo",
+    name: "Domingo",
+    day: 1,
+  },
+  {
+    id: "segunda",
+    name: "Segunda-Feira",
+    day: 2,
+  },
+  {
+    id: "terca",
+    name: "Terça-Feira",
+    day: 3,
+  },
+  {
+    id: "quarta",
+    name: "Quarta-Feira",
+    day: 4,
+  },
+  {
+    id: "quinta",
+    name: "Quinta-Feira",
+    day: 5,
+  },
+  {
+    id: "sexta",
+    name: "Sexta-Feira",
+    day: 6,
+  },
+  {
+    id: "sabado",
+    name: "Sábado",
+    day: 7,
+  },
+];
+
+const contatos = [
+  {
+    ddd: 11,
+    ind_whatsapp: true,
+    numero: 999191751,
+  },
+  {
+    ddd: 11,
+    ind_whatsapp: false,
+    numero: 42214783,
   },
 ];
 
@@ -86,4 +162,4 @@ const profile = {
   newsletter: false,
 };
 
-export { categories, explore, products, profile };
+export { categories, explore, products, profile, servicos, dayWeek, contatos };

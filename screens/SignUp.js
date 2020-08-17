@@ -13,6 +13,8 @@ import {
 import { Button, Block, Input, Text, Switch } from "../components";
 import { theme } from "../constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import api from "../services/api";
+import moment from "moment";
 const { width } = Dimensions.get("window");
 
 export default class SignUp extends Component {
@@ -24,8 +26,8 @@ export default class SignUp extends Component {
     loading: false,
     contato: {
       celular: {
-        ddd: 0,
-        numero: 0,
+        ddd: null,
+        numero: null,
       },
       email: "",
     },
@@ -34,12 +36,14 @@ export default class SignUp extends Component {
       login: "",
       senha: "",
     },
-    data_nascimento: new Date(),
+    data_nascimento: moment(new Date()).format("DD/MM/YYYY"),
+    data_datetime: new Date(),
     ind_whatsapp: false,
     nome_completo: "",
     tipo_usuario: "PRESTADOR",
     show: false,
     mode: "date",
+    loading: false,
   };
 
   setShow = (type) => {
@@ -49,7 +53,9 @@ export default class SignUp extends Component {
   onChange = (event, date) => {
     this.setShow(false);
     const currentDate = date;
-    this.setState({ data_nascimento: new Date(date) });
+    this.setState({
+      data_nascimento: moment(new Date(date)).format("DD/MM/YYYY"),
+    });
   };
 
   setMode = (currentMode) => {
@@ -65,41 +71,40 @@ export default class SignUp extends Component {
     this.setState({ mode: "date" });
   };
 
-  handleSignUp = () => {
-    console.log(this.state);
+  handleSignUp = async () => {
     const { navigation } = this.props;
-    const { email, username, password } = this.state;
-    const errors = [];
+    try {
+      this.setState({ loading: true });
 
-    Keyboard.dismiss();
-    this.setState({ loading: true });
-
-    // check with backend API or with some static data
-    if (!email) errors.push("email");
-    if (!username) errors.push("username");
-    if (!password) errors.push("password");
-
-    this.setState({ errors, loading: false });
-
-    if (!errors.length) {
-      Alert.alert(
-        "Success!",
-        "Your account has been created",
-        [
-          {
-            text: "Continue",
-            onPress: () => {
-              navigation.navigate("Browse");
-            },
+      const response = await api.post("/usuarios", {
+        contato: {
+          celular: {
+            ddd: this.state.contato.celular.ddd,
+            ind_whatsapp: this.state.ind_whatsapp,
+            numero: this.state.contato.celular.numero,
           },
-        ],
-        { cancelable: false }
-      );
-    }
-  };
+          email: this.state.email,
+        },
+        cpf: this.state.cpf,
+        dados_login: {
+          login: this.state.email,
+          senha: this.state.dados_login.senha,
+        },
+        data_nascimento: this.state.data_nascimento,
+        nome_completo: this.state.nome_completo,
+        tipo_usuario: "PRESTADOR",
+      });
 
-  onChangeNumber = (text) => {
-    return text && text.replace(/[^0-9]/g, "");
+      Keyboard.dismiss();
+
+      this.setState({ loading: false });
+
+      navigation.navigate("Browse");
+    } catch (err) {
+      Alert.alert("ERRO", "Erro ao realizar cadastro");
+      this.setState({ loading: false });
+      navigation.navigate("Browse");
+    }
   };
 
   render() {
@@ -108,7 +113,7 @@ export default class SignUp extends Component {
     const hasErrors = (key) => (errors.includes(key) ? styles.hasErrors : null);
 
     return (
-      <KeyboardAvoidingView style={styles.signup} behavior="padding">
+      <KeyboardAvoidingView style={styles.signup}>
         <Block flex={false} row center space="between" style={styles.header}>
           <Text h1 bold>
             Cadastro
@@ -136,7 +141,7 @@ export default class SignUp extends Component {
               onChangeText={(text) => this.setState({ nome_completo: text })}
             />
             <Input
-              label="CPF/CNPJ"
+              label="CPF"
               error={hasErrors("cpf")}
               style={[styles.input, hasErrors("cpf")]}
               defaultValue={this.state.cpf}
@@ -146,33 +151,32 @@ export default class SignUp extends Component {
               <Input
                 label="Data de Nascimento"
                 style={[styles.input]}
-                value={this.state.data_nascimento.toString()}
+                value={this.state.data_nascimento}
                 disabled={true}
               ></Input>
             </TouchableOpacity>
             {this.state.show && (
               <DateTimePicker
-                value={this.state.data_nascimento}
+                value={this.state.data_datetime}
                 mode={this.state.mode}
                 display="calendar"
                 onChange={(event, date) => this.onChange(event, date)}
               />
             )}
             <Input
+              number
               label="DDD"
               style={[styles.input]}
               defaultValue={this.state.contato.celular.ddd}
-              onChangeText={(text) =>
-                (this.state.contato.celular.ddd = this.onChangeNumber(text))
-              }
+              onChangeText={(text) => (this.state.contato.celular.ddd = text)}
             />
             <Input
+              number
               label="Celular"
               style={[styles.input]}
               defaultValue={this.state.contato.celular.numero}
-              value={this.onChangeNumber()}
               onChangeText={(text) =>
-                (this.state.contato.celular.numero = this.onChangeNumber(text))
+                (this.state.contato.celular.numero = text)
               }
             />
             <Block
@@ -204,7 +208,7 @@ export default class SignUp extends Component {
                 <ActivityIndicator size="small" color="white" />
               ) : (
                 <Text bold white center>
-                  Entrar
+                  Cadastrar
                 </Text>
               )}
             </Button>

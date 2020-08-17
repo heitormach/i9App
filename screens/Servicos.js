@@ -12,23 +12,23 @@ import { theme, mocks } from "../constants";
 
 const { width } = Dimensions.get("window");
 
-class Browse extends Component {
+class Servicos extends Component {
   state = {
-    active: "Menu",
-    categories: [],
+    active: "Geral",
+    servicos: [],
   };
 
   componentDidMount() {
-    this.setState({ categories: this.props.categories });
+    this.setState({ servicos: this.props.servicos });
   }
 
   handleTab = (tab) => {
-    const { categories } = this.props;
-    const filtered = categories.filter((category) =>
-      category.tags.includes(tab.toLowerCase())
+    const { servicos } = this.props;
+    const filtered = servicos.filter((servico) =>
+      servico.tags.includes(tab.toLowerCase())
     );
 
-    this.setState({ active: tab, categories: filtered });
+    this.setState({ active: tab, servicos: filtered });
   };
 
   renderTab(tab) {
@@ -50,14 +50,14 @@ class Browse extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { categories } = this.state;
-    const tabs = ["Menu", "Dashboard", "Últimos Clientes"];
+    const { servicos } = this.state;
+    const tabs = ["Geral"];
 
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
           <Text h1 bold>
-            Olá, Heitor
+            Meu Negócio
           </Text>
           <Button onPress={() => navigation.navigate("Settings")}>
             <Image source={profile.avatar} style={styles.avatar} />
@@ -72,18 +72,22 @@ class Browse extends Component {
           showsVerticalScrollIndicator={false}
           style={{ paddingVertical: theme.sizes.base * 2 }}
         >
-          <Block flex={false} row space="between" style={styles.categories}>
-            {categories.map((category) => (
+          <Block flex={false} row space="between" style={styles.servicos}>
+            {servicos.map((servico) => (
               <TouchableOpacity
-                key={category.name}
-                onPress={() => navigation.navigate(category.screen)}
+                key={servico.name}
+                onPress={() => navigation.navigate(servico.screen, { servico })}
               >
-                <Card center middle shadow style={styles.category}>
-                  <Badge margin={[0, 0, 15]} size={40}>
-                    <Image source={category.image} />
+                <Card center middle shadow style={styles.servico}>
+                  <Badge
+                    margin={[0, 0, 15]}
+                    size={40}
+                    color="rgba(37, 130, 91, 0.2)"
+                  >
+                    <Image source={servico.image} />
                   </Badge>
-                  <Text medium height={20}>
-                    {category.name}
+                  <Text center medium height={20}>
+                    {servico.name}
                   </Text>
                 </Card>
               </TouchableOpacity>
@@ -95,12 +99,12 @@ class Browse extends Component {
   }
 }
 
-Browse.defaultProps = {
+Servicos.defaultProps = {
   profile: mocks.profile,
-  categories: mocks.categories,
+  servicos: mocks.servicos,
 };
 
-export default Browse;
+export default Servicos;
 
 const styles = StyleSheet.create({
   header: {
@@ -124,12 +128,12 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.secondary,
     borderBottomWidth: 3,
   },
-  categories: {
+  servicos: {
     flexWrap: "wrap",
     paddingHorizontal: theme.sizes.base * 2,
     marginBottom: theme.sizes.base * 3.5,
   },
-  category: {
+  servico: {
     // this should be dynamic based on screen width
     minWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
     maxWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,

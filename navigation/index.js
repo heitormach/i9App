@@ -11,6 +11,9 @@ import Explore from "../screens/Explore";
 import Browse from "../screens/Browse";
 import Product from "../screens/Product";
 import Settings from "../screens/Settings";
+import Servicos from "../screens/Servicos";
+import Contatos from "../screens/Contatos";
+import Horarios from "../screens/Horarios";
 
 import { theme } from "../constants";
 
@@ -23,7 +26,10 @@ const screens = createStackNavigator(
     Explore,
     Browse,
     Product,
-    Settings
+    Settings,
+    Servicos,
+    Contatos,
+    Horarios,
   },
   {
     defaultNavigationOptions: {
@@ -31,20 +37,20 @@ const screens = createStackNavigator(
         height: theme.sizes.base * 4,
         backgroundColor: theme.colors.white, // or 'white
         borderBottomColor: "transparent",
-        elevation: 0 // for android
+        elevation: 0, // for android
       },
       headerBackImage: <Image source={require("../assets/icons/back.png")} />,
       headerBackTitle: null,
       headerLeftContainerStyle: {
         alignItems: "center",
         marginLeft: theme.sizes.base * 2,
-        paddingRight: theme.sizes.base
+        paddingRight: theme.sizes.base,
       },
       headerRightContainerStyle: {
         alignItems: "center",
-        paddingRight: theme.sizes.base
-      }
-    }
+        paddingRight: theme.sizes.base,
+      },
+    },
   }
 );
 

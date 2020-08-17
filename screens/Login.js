@@ -58,7 +58,7 @@ export default class Login extends Component {
     const hasErrors = (key) => (errors.includes(key) ? styles.hasErrors : null);
 
     return (
-      <KeyboardAvoidingView style={styles.login} behavior="padding">
+      <KeyboardAvoidingView style={styles.login}>
         <Block flex={false} row center space="between" style={styles.header}>
           <Text h1 bold>
             Entrar
