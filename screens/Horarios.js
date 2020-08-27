@@ -6,22 +6,32 @@ import {
   TouchableOpacity,
   Image,
   KeyboardAvoidingView,
-  Picker,
 } from "react-native";
 
 import { Card, Badge, Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const { width } = Dimensions.get("window");
 
 class Horarios extends Component {
   state = {
     horarios: [],
+    isDateTimePickerVisible: false,
   };
 
   componentDidMount() {
     this.setState({ horarios: this.props.horarios });
   }
+
+  _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+
+  _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+
+  _handleDatePicked = (time) => {
+    console.log("A time has been picked: ", time);
+    this._hideDateTimePicker();
+  };
 
   render() {
     const { profile, navigation } = this.props;
@@ -41,40 +51,18 @@ class Horarios extends Component {
             showsHorizontalScrollIndicator={false}
             style={{ paddingVertical: theme.sizes.base * 2 }}
           >
-            {horarios.map((horario) => (
-              <Block flex={false} row style={styles.horarios}>
-                <Text
-                  bold
-                  style={{ paddingVertical: 15, paddingHorizontal: 10 }}
-                  black
-                >
-                  {horario.name}
-                </Text>
-                <Picker
-                  selectedValue={this.state.language}
-                  style={{ height: 50, width: 100 }}
-                  onValueChange={(itemValue, itemIndex) =>
-                    this.setState({ language: itemValue })
-                  }
-                >
-                  <Picker.Item label="00" value="java" />
-                  <Picker.Item label="01" value="js" />
-                </Picker>
-                <Text style={{ paddingVertical: 15 }} black>
-                  :
-                </Text>
-                <Picker
-                  selectedValue={this.state.language}
-                  style={{ height: 50, width: 100 }}
-                  onValueChange={(itemValue, itemIndex) =>
-                    this.setState({ language: itemValue })
-                  }
-                >
-                  <Picker.Item label="00" value="java" />
-                  <Picker.Item label="01" value="js" />
-                </Picker>
-              </Block>
-            ))}
+            <Block flex={false} row space="between" style={styles.categories}>
+              {horarios.map((horario) => (
+                <TouchableOpacity key={horario.name}>
+                  <Card center middle shadow style={styles.horario}>
+                    <Badge margin={[0, 0, 15]} size={40}></Badge>
+                    <Text medium height={20}>
+                      {horario.horaIni.toString()}
+                    </Text>
+                  </Card>
+                </TouchableOpacity>
+              ))}
+            </Block>
           </ScrollView>
         </KeyboardAvoidingView>
       </Block>
@@ -106,7 +94,7 @@ const styles = StyleSheet.create({
   horarios: {
     flexWrap: "wrap",
     paddingHorizontal: theme.sizes.base * 2,
-    marginBottom: theme.sizes.base * 1.10,
+    marginBottom: theme.sizes.base * 1.1,
   },
   horario: {
     // this should be dynamic based on screen width
