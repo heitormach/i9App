@@ -66,6 +66,49 @@ const servicos = [
     count: 16,
     image: require("../assets/icons/relogio.png"),
   },
+  {
+    id: "services",
+    name: "Serviços",
+    tags: ["geral"],
+    screen: "Services",
+    count: 16,
+    image: require("../assets/icons/relogio.png"),
+  },
+];
+
+const faturamentos = [
+  {
+    id: "diario",
+    name: "Diário",
+    tags: ["geral"],
+    screen: "FatDiario",
+    count: 147,
+    image: require("../assets/icons/contatos.png"),
+  },
+  {
+    id: "semanal",
+    name: "Semanal",
+    tags: ["geral"],
+    screen: "FatSemanal",
+    count: 16,
+    image: require("../assets/icons/relogio.png"),
+  },
+  {
+    id: "mensal",
+    name: "Mensal",
+    tags: ["geral"],
+    screen: "FatMensal",
+    count: 16,
+    image: require("../assets/icons/relogio.png"),
+  },
+  {
+    id: "anual",
+    name: "Anual",
+    tags: ["geral"],
+    screen: "FatAnual",
+    count: 16,
+    image: require("../assets/icons/relogio.png"),
+  },
 ];
 
 const dayWeek = [
@@ -75,6 +118,7 @@ const dayWeek = [
     day: 1,
     horaIni: new Date(),
     horaFim: new Date(),
+    naoTrab: false,
   },
   {
     id: "segunda",
@@ -82,6 +126,7 @@ const dayWeek = [
     day: 2,
     horaIni: new Date(),
     horaFim: new Date(),
+    naoTrab: false,
   },
   {
     id: "terca",
@@ -89,6 +134,7 @@ const dayWeek = [
     day: 3,
     horaIni: new Date(),
     horaFim: new Date(),
+    naoTrab: false,
   },
   {
     id: "quarta",
@@ -96,6 +142,7 @@ const dayWeek = [
     day: 4,
     horaIni: new Date(),
     horaFim: new Date(),
+    naoTrab: false,
   },
   {
     id: "quinta",
@@ -103,6 +150,7 @@ const dayWeek = [
     day: 5,
     horaIni: new Date(),
     horaFim: new Date(),
+    naoTrab: false,
   },
   {
     id: "sexta",
@@ -110,6 +158,7 @@ const dayWeek = [
     day: 6,
     horaIni: new Date(),
     horaFim: new Date(),
+    naoTrab: false,
   },
   {
     id: "sabado",
@@ -117,6 +166,50 @@ const dayWeek = [
     day: 7,
     horaIni: new Date(),
     horaFim: new Date(),
+    naoTrab: false,
+  },
+];
+
+const fatMensal = [
+  {
+    id: 1,
+    descricao: "Corte para cabelos curtos",
+    nome: "Corte Curto",
+    preco: 30,
+    qtd: 25,
+    total: 750.0,
+  },
+  {
+    id: 2,
+    descricao: "Corte para cabelos médios",
+    nome: "Corte Médio",
+    preco: 40,
+    qtd: 10,
+    total: 400.0,
+  },
+  {
+    id: 3,
+    descricao: "Corte para cabelos longos",
+    nome: "Corte Longo",
+    preco: 50,
+    qtd: 5,
+    total: 250,
+  },
+  {
+    id: 4,
+    descricao: "Coloração de cabelo",
+    nome: "Coloração",
+    preco: 100,
+    qtd: 3,
+    total: 300,
+  },
+  {
+    id: 5,
+    descricao: "Faça a barba",
+    nome: "Barba",
+    preco: 30,
+    qtd: 10,
+    total: 300,
   },
 ];
 
@@ -130,6 +223,34 @@ const contatos = [
     ddd: 11,
     ind_whatsapp: false,
     numero: 42214783,
+  },
+];
+
+const services = [
+  {
+    descricao: "Corte para cabelos curtos",
+    nome: "Corte Curto",
+    preco: 30,
+  },
+  {
+    descricao: "Corte para cabelos médios",
+    nome: "Corte Médio",
+    preco: 40,
+  },
+  {
+    descricao: "Corte para cabelos longos",
+    nome: "Corte Longo",
+    preco: 50,
+  },
+  {
+    descricao: "Coloração de cabelo",
+    nome: "Coloração",
+    preco: 100,
+  },
+  {
+    descricao: "Faça a barba",
+    nome: "Barba",
+    preco: 30,
   },
 ];
 
@@ -176,4 +297,15 @@ const profile = {
   newsletter: false,
 };
 
-export { categories, explore, products, profile, servicos, dayWeek, contatos };
+export {
+  categories,
+  explore,
+  products,
+  profile,
+  servicos,
+  dayWeek,
+  contatos,
+  services,
+  faturamentos,
+  fatMensal,
+};

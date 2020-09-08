@@ -6,36 +6,155 @@ import {
   TouchableOpacity,
   Image,
   KeyboardAvoidingView,
+  Modal,
 } from "react-native";
 
-import { Card, Badge, Button, Block, Text } from "../components";
+import { Card, Badge, Button, Block, Text, Switch } from "../components";
 import { theme, mocks } from "../constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
+import moment from "moment";
 const { width } = Dimensions.get("window");
 
 class Horarios extends Component {
   state = {
     horarios: [],
     isDateTimePickerVisible: false,
+    horarioSelected: {},
+    showWeek: false,
+    horaSelected: {},
+    showTimePicker: false,
   };
 
   componentDidMount() {
     this.setState({ horarios: this.props.horarios });
   }
 
-  _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+  selectWeekDay(horario) {
+    this.setState({ horarioSelected: horario, showWeek: true });
+  }
 
-  _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+  horaSelected(horario, tipo) {
+    this.setState({
+      horaSelected: { hora: horario, tipo: tipo },
+      showTimePicker: true,
+    });
+  }
 
-  _handleDatePicked = (time) => {
-    console.log("A time has been picked: ", time);
-    this._hideDateTimePicker();
-  };
+  handleTime(event, date, tipo) {
+    console.log("passou");
+    this.setState({ showTimePicker: false });
+    if (date) {
+      if (tipo === "ini") {
+        this.state.horarioSelected.horaIni = new Date(date);
+      } else {
+        this.state.horarioSelected.horaFim = new Date(date);
+      }
+    }
+  }
+
+  renderSelectTimeWeek() {
+    return (
+      <Modal
+        animationType="slide"
+        visible={this.state.showWeek}
+        onRequestClose={() => this.setState({ showWeek: false })}
+      >
+        <Block
+          padding={[theme.sizes.padding * 2, theme.sizes.padding]}
+          space="between"
+        >
+          <Text h2 light>
+            {this.state.horarioSelected.name}
+          </Text>
+          <ScrollView style={{ marginVertical: theme.sizes.padding }}>
+            <TouchableOpacity
+              onPress={() =>
+                this.horaSelected(this.state.horarioSelected.horaIni, "ini")
+              }
+            >
+              <Text h2 light size={15}>
+                Horário de Início:
+              </Text>
+              <Text style={{ marginBottom: theme.sizes.base }} bold>
+                {" "}
+                {moment(new Date(this.state.horarioSelected.horaIni)).format(
+                  "HH:mm"
+                )}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                this.horaSelected(this.state.horarioSelected.horaFim, "fim")
+              }
+            >
+              <Text h2 light size={15}>
+                Horário de Término:
+              </Text>
+              <Text style={{ marginBottom: theme.sizes.base }} bold>
+                {moment(new Date(this.state.horarioSelected.horaFim)).format(
+                  "HH:mm"
+                )}
+              </Text>
+            </TouchableOpacity>
+            {this.state.showTimePicker && (
+              <DateTimePicker
+                value={new Date(this.state.horaSelected.hora)}
+                mode="time"
+                is24Hour={true}
+                display="default"
+                onChange={(event, date) =>
+                  this.handleTime(event, date, this.state.horaSelected.tipo)
+                }
+                on
+              />
+            )}
+            <Block
+              row
+              center
+              space="between"
+              style={{ marginBottom: theme.sizes.base * 2 }}
+            >
+              <Text gray2>Não trabalho</Text>
+              <Switch
+                value={this.state.horarioSelected.naoTrab}
+                onValueChange={(value) =>
+                  (this.state.horarioSelected.naoTrab = value)
+                }
+              />
+            </Block>
+          </ScrollView>
+          <Block middle padding={[theme.sizes.base / 2, 0]}>
+            <Button gradient onPress={() => this.setState({ showWeek: false })}>
+              <Text center white>
+                Salvar
+              </Text>
+            </Button>
+          </Block>
+        </Block>
+      </Modal>
+    );
+  }
 
   render() {
     const { profile, navigation } = this.props;
-    const { horarios, selectedHours, selectedMinutes } = this.state;
+    const { horarios } = this.state;
+    let horaRender;
+    const naoTrab = (horario) => {
+      if (horario.naoTrab) {
+        horaRender = (
+          <Text medium height={20}>
+            Não trabalho
+          </Text>
+        );
+      } else {
+        horaRender = (
+          <Text medium height={20}>
+            {moment(new Date(horario.horaIni)).format("HH:mm")} até{" "}
+            {moment(new Date(horario.horaFim)).format("HH:mm")}
+          </Text>
+        );
+      }
+    };
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -51,19 +170,24 @@ class Horarios extends Component {
             showsHorizontalScrollIndicator={false}
             style={{ paddingVertical: theme.sizes.base * 2 }}
           >
-            <Block flex={false} row space="between" style={styles.categories}>
+            <Block flex={false} row space="between" style={styles.horarios}>
               {horarios.map((horario) => (
-                <TouchableOpacity key={horario.name}>
+                <TouchableOpacity
+                  onPress={() => this.selectWeekDay(horario)}
+                  key={horario.name}
+                >
                   <Card center middle shadow style={styles.horario}>
-                    <Badge margin={[0, 0, 15]} size={40}></Badge>
                     <Text medium height={20}>
-                      {horario.horaIni.toString()}
+                      {horario.name}
                     </Text>
+                    {naoTrab(horario)}
+                    {horaRender}
                   </Card>
                 </TouchableOpacity>
               ))}
             </Block>
           </ScrollView>
+          {this.renderSelectTimeWeek()}
         </KeyboardAvoidingView>
       </Block>
     );
@@ -94,7 +218,7 @@ const styles = StyleSheet.create({
   horarios: {
     flexWrap: "wrap",
     paddingHorizontal: theme.sizes.base * 2,
-    marginBottom: theme.sizes.base * 1.1,
+    marginBottom: theme.sizes.base * 3.5,
   },
   horario: {
     // this should be dynamic based on screen width
