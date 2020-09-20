@@ -227,16 +227,14 @@ class Agendamento extends Component {
           </Button>
         </Block>
         <Block flex={false} row space="between" style={styles.agendHeader}>
-          <Text h1 light>
-            <Picker
-              selectedValue={meses[7]}
-              onValueChange={(v) => this.setState({ mesSelected: v })}
-            >
-              {meses.map((mes) => (
-                <Item label={mes} value={mes} />
-              ))}
-            </Picker>
-          </Text>
+          <Picker
+            selectedValue={meses[7]}
+            onValueChange={(v) => this.setState({ mesSelected: v })}
+          >
+            {meses.map((mes) => (
+              <Item label={mes} value={mes} />
+            ))}
+          </Picker>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
           {this.renderAgends()}
