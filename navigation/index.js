@@ -17,6 +17,9 @@ import Horarios from "../screens/Horarios";
 import Services from "../screens/Services";
 import Faturamento from "../screens/Faturamento";
 import FatMensal from "../screens/FatMensal";
+import Agendamento from "../screens/Agendamento";
+import ServicosDia from "../screens/ServicosDia";
+import Planos from "../screens/Planos";
 
 import { theme } from "../constants";
 
@@ -36,6 +39,9 @@ const screens = createStackNavigator(
     Services,
     Faturamento,
     FatMensal,
+    Agendamento,
+    ServicosDia,
+    Planos,
   },
   {
     defaultNavigationOptions: {

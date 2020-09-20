@@ -3,7 +3,7 @@ const categories = [
     id: "agendamentos",
     name: "Agendamentos",
     tags: ["menu"],
-    screen: "Agendamentos",
+    screen: "Agendamento",
     count: 147,
     image: require("../assets/icons/agendamentos.png"),
   },
@@ -26,7 +26,7 @@ const categories = [
   {
     id: "planos",
     name: "Plano",
-    screen: "Plano",
+    screen: "Planos",
     tags: ["menu"],
     count: 17,
     image: require("../assets/icons/planos.png"),
@@ -254,6 +254,60 @@ const services = [
   },
 ];
 
+const agendamentos = [
+  {
+    id: 1,
+    dia: "01",
+    mes: "08",
+    servicos: [
+      {
+        id: 1,
+        descricao: "Corte para cabelos curtos",
+        nome: "Corte Curto",
+        preco: 30,
+        hora: "10:00",
+        cliente: "Maria",
+        concluido: true,
+      },
+      {
+        id: 2,
+        descricao: "Corte para cabelos médios",
+        nome: "Corte Médio",
+        preco: 40,
+        hora: "12:00",
+        cliente: "Jorge",
+        concluido: false,
+      },
+      {
+        id: 3,
+        descricao: "Corte para cabelos longos",
+        nome: "Corte Longo",
+        preco: 50,
+        hora: "13:00",
+        cliente: "Heitor Machado",
+        concluido: false,
+      },
+      {
+        id: 4,
+        descricao: "Coloração de cabelo",
+        nome: "Coloração",
+        preco: 100,
+        hora: "15:00",
+        cliente: "Ana",
+        concluido: false,
+      },
+      {
+        id: 5,
+        descricao: "Faça a barba",
+        nome: "Barba",
+        preco: 30,
+        hora: "17:00",
+        cliente: "Rogerio",
+        concluido: false,
+      },
+    ],
+  },
+];
 const products = [
   {
     id: 1,
@@ -287,15 +341,39 @@ const explore = [
 ];
 
 const profile = {
-  username: "react-ui-kit",
-  location: "Europe",
-  email: "contact@react-ui-kit.com",
+  username: "heitor.machado@i9app.com.br",
+  location: "Brasil",
+  email: "heitor.machado@i9app.com.br",
   avatar: require("../assets/images/avatar.png"),
   budget: 1000,
   monthly_cap: 5000,
   notifications: true,
   newsletter: false,
 };
+
+const planos = [
+  {
+    id: 1,
+    nome: "Mentor",
+    preco: 0.0,
+    descricao:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris bibendum justo quis quam dictum mollis molestie eget velit. Curabitur vestibulum ultricies pretium. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent vulputate fermentum magna, non sodales tellus congue quis. Curabitur vestibulum sollicitudin imperdiet. Sed laoreet varius fringilla. Vivamus ligula turpis, lobortis et ante et, facilisis luctus quam. In venenatis volutpat iaculis. Nulla tempor felis et rutrum sagittis. Phasellus ornare tincidunt hendrerit. Nam condimentum laoreet nisl, nec fermentum nisi ultricies vel.",
+  },
+  {
+    id: 2,
+    nome: "Mento Mais - Individual",
+    preco: 30.0,
+    descricao:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris bibendum justo quis quam dictum mollis molestie eget velit. Curabitur vestibulum ultricies pretium. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent vulputate fermentum magna, non sodales tellus congue quis. Curabitur vestibulum sollicitudin imperdiet. Sed laoreet varius fringilla. Vivamus ligula turpis, lobortis et ante et, facilisis luctus quam. In venenatis volutpat iaculis. Nulla tempor felis et rutrum sagittis. Phasellus ornare tincidunt hendrerit. Nam condimentum laoreet nisl, nec fermentum nisi ultricies vel.",
+  },
+  {
+    id: 3,
+    nome: "Mentor Mais - Equipe",
+    preco: 70.0,
+    descricao:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris bibendum justo quis quam dictum mollis molestie eget velit. Curabitur vestibulum ultricies pretium. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent vulputate fermentum magna, non sodales tellus congue quis. Curabitur vestibulum sollicitudin imperdiet. Sed laoreet varius fringilla. Vivamus ligula turpis, lobortis et ante et, facilisis luctus quam. In venenatis volutpat iaculis. Nulla tempor felis et rutrum sagittis. Phasellus ornare tincidunt hendrerit. Nam condimentum laoreet nisl, nec fermentum nisi ultricies vel.",
+  },
+];
 
 export {
   categories,
@@ -308,4 +386,6 @@ export {
   services,
   faturamentos,
   fatMensal,
+  agendamentos,
+  planos,
 };

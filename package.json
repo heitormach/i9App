@@ -9,6 +9,7 @@
   "dependencies": {
     "@expo/vector-icons": "^10.0.6",
     "@react-native-community/datetimepicker": "2.1.0",
+    "@react-native-community/picker": "^1.8.0",
     "apisauce": "^1.1.2",
     "expo": "^36.0.0",
     "expo-asset": "~8.0.0",
