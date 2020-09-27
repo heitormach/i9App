@@ -17,31 +17,15 @@ import moment from "moment";
 const { width } = Dimensions.get("window");
 import { BarChart, Grid, YAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
-import { Picker } from "@react-native-community/picker";
 
-class FatMensal extends Component {
+class FatDiario extends Component {
   state = {
     faturamentos: [],
-    isDateTimePickerVisible: false,
     faturamentoSelected: {},
     showWeek: false,
-    horaSelected: {},
-    showTimePicker: false,
-    meses: [
-      "Janeiro",
-      "Fevereiro",
-      "Março",
-      "Abril",
-      "Maio",
-      "Junho",
-      "Julho",
-      "Agosto",
-      "Setembro",
-      "Outubro",
-      "Novembro",
-      "Dezembro",
-    ],
-    mesSelected: "Agosto",
+    diaSelected: {},
+    showDatePicker: false,
+    dataSelected: new Date(),
   };
 
   componentDidMount() {
@@ -52,20 +36,21 @@ class FatMensal extends Component {
     this.setState({ faturamentoSelected: faturamento, showWeek: true });
   }
 
-  horaSelected(faturamento, tipo) {
+  diaSelected(faturamento, tipo) {
     this.setState({
-      horaSelected: { hora: faturamento, tipo: tipo },
-      showTimePicker: true,
+      diaSelected: { hora: faturamento, tipo: tipo },
     });
   }
 
   handleTime(event, date, tipo) {
-    this.setState({ showTimePicker: false });
-    if (tipo === "ini") {
-      this.state.faturamentoSelected.horaIni = new Date(date);
-    } else {
-      this.state.faturamentoSelected.horaFim = new Date(date);
+    if (date) {
+      this.setState({ dataSelected: date });
     }
+    this.setState({ showDatePicker: false });
+  }
+
+  showDatePicker() {
+    this.setState({ showDatePicker: true });
   }
 
   renderChart() {
@@ -101,93 +86,6 @@ class FatMensal extends Component {
     );
   }
 
-  renderSelectTimeWeek() {
-    return (
-      <Modal
-        animationType="slide"
-        visible={this.state.showWeek}
-        onRequestClose={() => this.setState({ showWeek: false })}
-      >
-        <Block
-          padding={[theme.sizes.padding * 2, theme.sizes.padding]}
-          space="between"
-        >
-          <Text h2 light>
-            {this.state.faturamentoSelected.name}
-          </Text>
-          <ScrollView style={{ marginVertical: theme.sizes.padding }}>
-            <TouchableOpacity
-              onPress={() =>
-                this.horaSelected(this.state.faturamentoSelected.horaIni, "ini")
-              }
-            >
-              <Text
-                h2
-                light
-                size={15}
-                style={{ marginBottom: theme.sizes.base }}
-              >
-                Horário de Início:
-                {moment(
-                  new Date(this.state.faturamentoSelected.horaIni)
-                ).format("HH:mm")}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                this.horaSelected(this.state.faturamentoSelected.horaFim, "fim")
-              }
-            >
-              <Text
-                h2
-                light
-                size={15}
-                style={{ marginBottom: theme.sizes.base }}
-              >
-                Horário de Término:
-                {moment(
-                  new Date(this.state.faturamentoSelected.horaFim)
-                ).format("HH:mm")}
-              </Text>
-            </TouchableOpacity>
-            {this.state.showTimePicker && (
-              <DateTimePicker
-                value={new Date(this.state.horaSelected.hora)}
-                mode="time"
-                is24Hour={true}
-                display="default"
-                onChange={(event, date) =>
-                  this.handleTime(event, date, this.state.horaSelected.tipo)
-                }
-              />
-            )}
-            <Block
-              row
-              center
-              space="between"
-              style={{ marginBottom: theme.sizes.base * 2 }}
-            >
-              <Text gray2>Não trabalho</Text>
-              <Switch
-                value={this.state.faturamentoSelected.naoTrab}
-                onValueChange={(value) =>
-                  (this.state.faturamentoSelected.naoTrab = value)
-                }
-              />
-            </Block>
-          </ScrollView>
-          <Block middle padding={[theme.sizes.base / 2, 0]}>
-            <Button gradient onPress={() => this.setState({ showWeek: false })}>
-              <Text center white>
-                Salvar
-              </Text>
-            </Button>
-          </Block>
-        </Block>
-      </Modal>
-    );
-  }
-
   renderTotal() {
     return (
       <Block row card shadow color="white" style={styles.fat}>
@@ -208,7 +106,7 @@ class FatMensal extends Component {
         </Block>
         <Block flex={0.75} column middle>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Você realizou 53 serviços no mês
+            Você realizou 53 serviços no dia
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
             Valor Total Arrecadado: R$ 2.000,00
@@ -275,32 +173,30 @@ class FatMensal extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { meses } = this.state;
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
           <Text h1 bold>
-            Faturamento Mensal
+            Faturamento Diário
           </Text>
           <Button onPress={() => navigation.navigate("Settings")}>
             <Image source={profile.avatar} style={styles.avatar} />
           </Button>
         </Block>
         <Block flex={false} row space="between" style={styles.fatsHeader}>
-          <Picker
-            style={{
-              height: 50,
-              width: 200,
-              transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],
-            }}
-            selectedValue={this.state.mesSelected}
-            onValueChange={(v) => this.setState({ mesSelected: v })}
-            itemStyle={{ fontSize: 20 }}
-          >
-            {meses.map((mes) => (
-              <Picker.Item key={`mes-${mes}`} label={mes} value={mes} />
-            ))}
-          </Picker>
+          <TouchableOpacity onPress={() => this.showDatePicker()}>
+            <Text center h1 bold>
+              {moment(this.state.dataSelected).format("DD MMMM YYYY")}
+            </Text>
+          </TouchableOpacity>
+          {this.state.showDatePicker && (
+            <DateTimePicker
+              value={this.state.dataSelected}
+              mode="date"
+              display="calendar"
+              onChange={(event, date) => this.handleTime(event, date)}
+            />
+          )}
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
           {this.renderChart()}
@@ -311,12 +207,12 @@ class FatMensal extends Component {
   }
 }
 
-FatMensal.defaultProps = {
+FatDiario.defaultProps = {
   profile: mocks.profile,
   fats: mocks.fatMensal,
 };
 
-export default FatMensal;
+export default FatDiario;
 
 const styles = StyleSheet.create({
   header: {

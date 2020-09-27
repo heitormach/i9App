@@ -7,13 +7,14 @@ import {
   Modal,
   Image,
   SafeAreaView,
-  View,
+  KeyboardAvoidingView,
+  TextInput,
 } from "react-native";
 
-import { Card, Badge, Button, Block, Text, Switch } from "../components";
+import { Button, Block, Text, Switch, Divider, Input } from "../components";
 import { theme, mocks } from "../constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Picker, Item } from "@react-native-community/picker";
+import { Picker } from "@react-native-community/picker";
 import moment from "moment";
 const { width } = Dimensions.get("window");
 
@@ -39,7 +40,15 @@ class Agendamento extends Component {
       "Novembro",
       "Dezembro",
     ],
-    mesSelected: null,
+    mesSelected: "Agosto",
+    servicos: [],
+    servicoSelected: "",
+    diaSelected: moment(new Date()).format("DD/MM/YYYY"),
+    dateTime: new Date(),
+    cliente: "",
+    horariosDisponiveis: ["12:00", "13:00", "14:00", "15:00"],
+    showNewService: false,
+    showDatePicker: false,
   };
 
   componentDidMount() {
@@ -66,95 +75,208 @@ class Agendamento extends Component {
     }
   }
 
-  renderSelectTimeWeek() {
+  onChange = (event, date) => {
+    this.setState({ showDatePicker: false });
+    if (date) {
+      const currentDate = date;
+      this.setState({
+        diaSelected: moment(new Date(date)).format("DD/MM/YYYY"),
+        dateTime: new Date(date),
+      });
+    }
+  };
+
+  renderCreateService() {
+    const { services } = mocks;
+    const { horariosDisponiveis } = this.state;
+    console.log(services);
     return (
       <Modal
         animationType="slide"
-        visible={this.state.showWeek}
-        onRequestClose={() => this.setState({ showWeek: false })}
+        visible={this.state.showNewService}
+        onRequestClose={() => this.setState({ showNewService: false })}
       >
-        <Block
-          padding={[theme.sizes.padding * 2, theme.sizes.padding]}
-          space="between"
-        >
-          <Text h2 light>
-            {this.state.agenduramentoSelected.name}
-          </Text>
-          <ScrollView style={{ marginVertical: theme.sizes.padding }}>
-            <TouchableOpacity
-              onPress={() =>
-                this.horaSelected(
-                  this.state.agenduramentoSelected.horaIni,
-                  "ini"
-                )
-              }
-            >
-              <Text
-                h2
-                light
-                size={15}
-                style={{ marginBottom: theme.sizes.base }}
+        <Block>
+          <Block flex={false} row center space="between" style={styles.header}>
+            <Text h1 bold>
+              Novo Agendamento
+            </Text>
+          </Block>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Block style={styles.inputs}>
+              <Block
+                row
+                space="between"
+                margin={[10, 0]}
+                style={styles.inputRow}
               >
-                Horário de Início:
-                {moment(
-                  new Date(this.state.agenduramentoSelected.horaIni)
-                ).format("HH:mm")}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                this.horaSelected(
-                  this.state.agenduramentoSelected.horaFim,
-                  "fim"
-                )
-              }
-            >
-              <Text
-                h2
-                light
-                size={15}
-                style={{ marginBottom: theme.sizes.base }}
+                <Block>
+                  <TouchableOpacity
+                    onPress={() => this.setState({ showDatePicker: true })}
+                  >
+                    <Text gray2>Data</Text>
+                    <TextInput
+                      defaultValue={this.state.diaSelected}
+                      disabled={true}
+                    ></TextInput>
+                  </TouchableOpacity>
+                  {this.state.showDatePicker && (
+                    <DateTimePicker
+                      value={this.state.dateTime}
+                      mode="date"
+                      display="calendar"
+                      onChange={(event, date) => this.onChange(event, date)}
+                    />
+                  )}
+                </Block>
+              </Block>
+              <Block
+                row
+                space="between"
+                margin={[10, 0]}
+                style={styles.inputRow}
               >
-                Horário de Término:
-                {moment(
-                  new Date(this.state.agenduramentoSelected.horaFim)
-                ).format("HH:mm")}
-              </Text>
-            </TouchableOpacity>
-            {this.state.showTimePicker && (
-              <DateTimePicker
-                value={new Date(this.state.horaSelected.hora)}
-                mode="time"
-                is24Hour={true}
-                display="default"
-                onChange={(event, date) =>
-                  this.handleTime(event, date, this.state.horaSelected.tipo)
-                }
-              />
-            )}
-            <Block
-              row
-              center
-              space="between"
-              style={{ marginBottom: theme.sizes.base * 2 }}
-            >
-              <Text gray2>Não trabalho</Text>
-              <Switch
-                value={this.state.agenduramentoSelected.naoTrab}
-                onValueChange={(value) =>
-                  (this.state.agenduramentoSelected.naoTrab = value)
-                }
-              />
+                <Block>
+                  <Text gray2>Serviço</Text>
+                  <Picker
+                    style={{
+                      height: 50,
+                      width: 150,
+                    }}
+                    selectedValue={this.state.servicoSelected}
+                    onValueChange={(v) => this.setState({ servicoSelected: v })}
+                    itemStyle={{ fontSize: 20 }}
+                  >
+                    {services.map((servico) => (
+                      <Picker.Item
+                        key={`servico-${servico.nome}`}
+                        label={servico.nome}
+                        value={servico.nome}
+                      />
+                    ))}
+                  </Picker>
+                </Block>
+                <Block>
+                  <Text gray2>Horário</Text>
+                  <Picker
+                    style={{
+                      height: 50,
+                      width: 150,
+                    }}
+                    selectedValue={this.state.horaSelected}
+                    onValueChange={(v) => this.setState({ horaSelected: v })}
+                    itemStyle={{ fontSize: 20 }}
+                  >
+                    {horariosDisponiveis.map((hora) => (
+                      <Picker.Item
+                        key={`servico-${hora}`}
+                        label={hora}
+                        value={hora}
+                      />
+                    ))}
+                  </Picker>
+                </Block>
+              </Block>
+              <Block
+                row
+                space="between"
+                margin={[10, 0]}
+                style={styles.inputRow}
+              >
+                <Block>
+                  <Text gray2>Cliente</Text>
+                  <TextInput
+                    defaultValue={this.state.cliente}
+                    disabled={false}
+                  ></TextInput>
+                </Block>
+              </Block>
+              <Block middle padding={[theme.sizes.base / 2, 0]}>
+                <Button
+                  gradient
+                  onPress={() => this.setState({ showNewService: false })}
+                >
+                  <Text center white>
+                    Agendar
+                  </Text>
+                </Button>
+                <Button
+                  color="accent"
+                  onPress={() => this.setState({ showNewService: false })}
+                >
+                  <Text center white>
+                    Voltar
+                  </Text>
+                </Button>
+              </Block>
             </Block>
           </ScrollView>
-          <Block middle padding={[theme.sizes.base / 2, 0]}>
-            <Button gradient onPress={() => this.setState({ showWeek: false })}>
-              <Text center white>
-                Salvar
-              </Text>
-            </Button>
-          </Block>
         </Block>
+      </Modal>
+    );
+  }
+
+  renderSelectedService() {
+    return (
+      <Modal
+        animationType="slide"
+        visible={this.state.showService}
+        onRequestClose={() => this.setState({ showService: false })}
+      >
+        <KeyboardAvoidingView style={styles.keyavoid}>
+          <Block
+            padding={[theme.sizes.padding * 2, theme.sizes.padding]}
+            space="between"
+          >
+            <Text h2 light>
+              {this.state.serviceSelected.nome}
+            </Text>
+            <Block>
+              <ScrollView style={{ marginVertical: theme.sizes.padding }}>
+                <Block middle style={styles.inputs}>
+                  <Input
+                    multiline={true}
+                    numberOfLines={10}
+                    label="Descrição"
+                    style={[styles.input]}
+                    defaultValue={this.state.serviceSelected.descricao}
+                    onChangeText={(text) => {
+                      this.state.serviceSelected.descricao = text;
+                    }}
+                  />
+                  <Input
+                    number
+                    label="Preço (R$)"
+                    style={[styles.input]}
+                    defaultValue={String(this.state.serviceSelected.preco)}
+                    onChangeText={(text) => {
+                      this.state.serviceSelected.preco = Number(text);
+                    }}
+                  />
+                </Block>
+              </ScrollView>
+            </Block>
+            <Block middle padding={[theme.sizes.base / 2, 0]}>
+              <Button
+                gradient
+                onPress={() => this.setState({ showService: false })}
+              >
+                <Text center white>
+                  Salvar
+                </Text>
+              </Button>
+              <Button
+                color="accent"
+                onPress={() => this.setState({ showService: false })}
+              >
+                <Text center white>
+                  Excluir
+                </Text>
+              </Button>
+            </Block>
+          </Block>
+        </KeyboardAvoidingView>
       </Modal>
     );
   }
@@ -228,17 +350,30 @@ class Agendamento extends Component {
         </Block>
         <Block flex={false} row space="between" style={styles.agendHeader}>
           <Picker
-            selectedValue={meses[7]}
+            style={{
+              height: 50,
+              width: 200,
+              transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],
+            }}
+            selectedValue={this.state.mesSelected}
             onValueChange={(v) => this.setState({ mesSelected: v })}
+            itemStyle={{ fontSize: 20 }}
           >
             {meses.map((mes) => (
-              <Item label={mes} value={mes} />
+              <Picker.Item key={`mes-${mes}`} label={mes} value={mes} />
             ))}
           </Picker>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
           {this.renderAgends()}
         </ScrollView>
+        <TouchableOpacity
+          onPress={() => this.setState({ showNewService: true })}
+          style={styles.fab}
+        >
+          <Text style={styles.fabIcon}>+</Text>
+        </TouchableOpacity>
+        {this.renderCreateService()}
       </Block>
     );
   }
@@ -247,6 +382,7 @@ class Agendamento extends Component {
 Agendamento.defaultProps = {
   profile: mocks.profile,
   agendamentos: mocks.agendamentos,
+  servicos: mocks.services,
 };
 
 export default Agendamento;
@@ -283,7 +419,7 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   agendHeader: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 70,
     paddingBottom: 2,
   },
   agend: {
@@ -297,5 +433,28 @@ const styles = StyleSheet.create({
   },
   safe: {
     flex: 1,
+  },
+  fab: {
+    position: "absolute",
+    width: 56,
+    height: 56,
+    alignItems: "center",
+    justifyContent: "center",
+    right: 20,
+    bottom: 20,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 30,
+    elevation: 8,
+  },
+  fabIcon: {
+    fontSize: 40,
+    color: "white",
+  },
+  inputs: {
+    marginTop: theme.sizes.base * 0.7,
+    paddingHorizontal: theme.sizes.base * 2,
+  },
+  inputRow: {
+    alignItems: "flex-end",
   },
 });

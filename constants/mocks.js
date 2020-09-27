@@ -351,6 +351,81 @@ const profile = {
   newsletter: false,
 };
 
+const estudos = [
+  {
+    nome: "Empreendedorismo",
+    titulo: "O que é empreendedorismo?",
+    conteudo: [
+      {
+        subTitulo: "",
+        paragrafos: [
+          "É identificar problemas e oportunidades, criar soluções e investir na criação de algo positivo para a sociedade. Pode ser um negócio, um projeto ou mesmo um movimento que gere mudanças reais e impacto no dia-a-dia das pessoas.",
+          "A essência do empreendedorismo está na observação e no aproveitamento de novas oportunidades nos negócios.",
+          "O Brasil apresenta grande potencial para o empreendedorismo. De acordo com A Global Entrepreneurship Monitor (GEM), a Taxa de Empreendedorismo Total no Brasil é de 38% (2018). São 52 milhões de brasileiros se dedicando ao próprio negócio.",
+        ],
+      },
+      {
+        subTitulo: "O que é ser empreendedor?",
+        paragrafos: [
+          "Empreendedorismo é sinônimo de dinheiro no bolso? O ideal é que a resposta seja positiva. Mas, na prática, nem sempre é assim. Muita gente pensa que quem tem um negócio próprio, literalmente, tem muito dinheiro - e toda pessoa que resolve e tem a coragem de empreender quer e merece, de fato, ter prosperidade.",
+          "No entanto, ser empreendedor não é, literalmente, ter essa garantia. Muito antes, ser empreendedor é ter a ousadia de colocar suas ideias em práticas.",
+          "Aproveitar as oportunidades do mercado e transformar crises em oportunidade é uma característica do brasileiro.",
+        ],
+      },
+    ],
+  },
+
+  {
+    nome: "Comunicação",
+    titulo: "Comunicação com o cliente: vantagens de usar a tecnologia",
+    conteudo: [
+      {
+        subTitulo: "",
+        paragrafos: [
+          "Para fazer o negócio crescer e gerar mais resultados, é necessário estar em constante comunicação com o cliente. Esse contato ajuda a fixar a marca na cabeça do público e fornece informações importantes para a administrar o negócio. O contato pode existir tanto pessoalmente como por meio da internet, utilizando alguma plataforma ou um outro veículo de comunicação.",
+          "Hoje vamos falar sobre as maneiras de utilizar a tecnologia para manter um relacionamento entre público e empresa. Mostrar algumas vantagens de fazer a comunicação com o cliente por meio de aplicativos, redes sociais, e-mails e outras ferramentas similares.",
+        ],
+      },
+      {
+        subTitulo: "1. Comunicação com o cliente a qualquer hora e lugar",
+        paragrafos: [
+          "A primeira coisa que a gente pensa quando fala em comunicação com o cliente em ambientes digitais é na facilidade e agilidade com que ela torna possível o contato entre as pessoas.",
+          "Como já nos acostumamos com esta comodidade no dia a dia, pode ser que não consigamos avaliar exatamente a sua dimensão. Para ficar mais fácil de perceber e até entender o quanto andamos dependentes da tecnologia, basta lembrar como era a vida sem um celular.",
+          "Atualmente, esses aparelhos possibilitam que acessemos informações a qualquer hora e lugar e que pessoas em diferentes regiões (e até países) se comuniquem instantaneamente, tanto por meio de textos quanto por vídeos e áudios — e isso pode ser usado não somente para fins pessoais, mas também para fins profissionais.",
+        ],
+      },
+      {
+        subTitulo: "2. Processos repetitivos muito mais organizados",
+        paragrafos: [
+          "Imaginemos o serviço de uma secretária que precisa administrar uma agenda de horários em um caderno. Por não haver disponibilidade de acesso às informações, ela tem que atender individualmente cada pessoa.",
+          "Já quando usamos um sistema aberto a todos os interessados, a comunicação com o cliente de que horários estão vagos e quais já foram ocupados acontece de forma mais rápida, eficiente e organizada.",
+        ],
+      },
+      {
+        subTitulo: "3. Custos menores",
+        paragrafos: [
+          "Soluções tecnológicas são normalmente mais baratas do que os meios tradicionais. Prova disso é a grande expansão do número de pessoas que se comunicam pelo WhatsApp, um aplicativo gratuito de comunicação que evita gastos com ligações telefônicas.",
+          "Além disso, há também as redes sociais, que podem ser utilizadas para transmitir todas as informações que precisa a quem quer que seja caso o aparelho apresente problemas para realizar ligações.",
+        ],
+      },
+      {
+        subTitulo: "4. Conforto para todos",
+        paragrafos: [
+          "Outro benefício muito importante é a possibilidade de responder quando quiser. Se uma pessoa ligasse para você, seria preciso fazer uma escolha na hora, seja para aceitar a ligação ou não. Já no caso de uma comunicação com o cliente pelos meios digitais, é possível responder no mesmo instante ou optar por dar um retorno em outro horário.",
+        ],
+      },
+      {
+        subTitulo: "5. Relatórios e estatísticas na palma da mão",
+        paragrafos: [
+          "Principalmente quando o assunto é negócio, ter condições de mensurar os contatos que andam sendo feitos e seus resultados é uma grande vantagem. Se estivermos falando de um aplicativo preparado para facilitar a comunicação com o cliente e, além disso, conseguir mensurar o resultado desta comunicação, o benefício é ainda maior, já que a informação é qualificada.",
+          "Poder contar com um software preparado para o controle de uma atividade específica vai ajudar tanto na melhoria do seu contato com o público como na gestão do próprio negócio.",
+          "Se você conhece alguém que pode também se interessar por estas vantagens ou que precisa se atualizar um pouco mais, aproveite para compartilhar este conteúdo em suas redes sociais.",
+        ],
+      },
+    ],
+  },
+];
+
 const planos = [
   {
     id: 1,
@@ -388,4 +463,5 @@ export {
   fatMensal,
   agendamentos,
   planos,
+  estudos,
 };

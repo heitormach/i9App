@@ -6,7 +6,7 @@ import {
   FlatList,
   Modal,
   StyleSheet,
-  ScrollView
+  ScrollView,
 } from "react-native";
 
 import { Button, Block, Text } from "../components";
@@ -16,13 +16,13 @@ const { width, height } = Dimensions.get("window");
 
 class Welcome extends Component {
   static navigationOptions = {
-    header: null
+    header: null,
   };
 
   scrollX = new Animated.Value(0);
 
   state = {
-    showTerms: false
+    showTerms: false,
   };
 
   renderTermsService() {
@@ -37,7 +37,7 @@ class Welcome extends Component {
           space="between"
         >
           <Text h2 light>
-            Terms of Service
+            Termos de Serviço
           </Text>
 
           <ScrollView style={{ marginVertical: theme.sizes.padding }}>
@@ -153,7 +153,7 @@ class Welcome extends Component {
               onPress={() => this.setState({ showTerms: false })}
             >
               <Text center white>
-                I understand
+                Entendi
               </Text>
             </Button>
           </Block>
@@ -185,8 +185,8 @@ class Welcome extends Component {
         )}
         onScroll={Animated.event([
           {
-            nativeEvent: { contentOffset: { x: this.scrollX } }
-          }
+            nativeEvent: { contentOffset: { x: this.scrollX } },
+          },
         ])}
       />
     );
@@ -201,7 +201,7 @@ class Welcome extends Component {
           const opacity = stepPosition.interpolate({
             inputRange: [index - 1, index, index + 1],
             outputRange: [0.4, 1, 0.4],
-            extrapolate: "clamp"
+            extrapolate: "clamp",
           });
 
           return (
@@ -266,8 +266,8 @@ Welcome.defaultProps = {
   illustrations: [
     { id: 1, source: require("../assets/images/illustration_1.png") },
     { id: 2, source: require("../assets/images/illustration_2.png") },
-    { id: 3, source: require("../assets/images/illustration_3.png") }
-  ]
+    { id: 3, source: require("../assets/images/illustration_3.png") },
+  ],
 };
 
 export default Welcome;
@@ -277,12 +277,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: theme.sizes.base * 3,
     right: 0,
-    left: 0
+    left: 0,
   },
   steps: {
     width: 5,
     height: 5,
     borderRadius: 5,
-    marginHorizontal: 2.5
-  }
+    marginHorizontal: 2.5,
+  },
 });

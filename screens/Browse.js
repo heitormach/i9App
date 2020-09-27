@@ -51,7 +51,7 @@ class Browse extends Component {
   render() {
     const { profile, navigation } = this.props;
     const { categories } = this.state;
-    const tabs = ["Menu", "Dashboard", "Últimos Clientes"];
+    const tabs = ["Menu"];
 
     return (
       <Block>

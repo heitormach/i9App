@@ -4,19 +4,19 @@ import {
   ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
-  StyleSheet
+  StyleSheet,
 } from "react-native";
 
 import { Button, Block, Input, Text } from "../components";
 import { theme } from "../constants";
 
-const VALID_EMAIL = "contact@react-ui-kit.com";
+const VALID_EMAIL = "heitor.machado@i9app.com";
 
 export default class Forgot extends Component {
   state = {
     email: VALID_EMAIL,
     errors: [],
-    loading: false
+    loading: false,
   };
 
   handleForgot() {
@@ -36,23 +36,23 @@ export default class Forgot extends Component {
 
     if (!errors.length) {
       Alert.alert(
-        "Password sent!",
-        "Please check you email.",
+        "Senha enviada",
+        "Cheque seu e-mail",
         [
           {
             text: "OK",
             onPress: () => {
               navigation.navigate("Login");
-            }
-          }
+            },
+          },
         ],
         { cancelable: false }
       );
     } else {
       Alert.alert(
-        "Error",
-        "Please check you Email address.",
-        [{ text: "Try again" }],
+        "Erro",
+        "Verifique se o e-mail está correto e tente novamente",
+        [{ text: "Tentar novamente" }],
         { cancelable: false }
       );
     }
@@ -61,13 +61,13 @@ export default class Forgot extends Component {
   render() {
     const { navigation } = this.props;
     const { loading, errors } = this.state;
-    const hasErrors = key => (errors.includes(key) ? styles.hasErrors : null);
+    const hasErrors = (key) => (errors.includes(key) ? styles.hasErrors : null);
 
     return (
       <KeyboardAvoidingView style={styles.forgot} behavior="padding">
         <Block padding={[0, theme.sizes.base * 2]}>
           <Text h1 bold>
-            Forgot
+            Recuperar Senha
           </Text>
           <Block middle>
             <Input
@@ -75,14 +75,14 @@ export default class Forgot extends Component {
               error={hasErrors("email")}
               style={[styles.input, hasErrors("email")]}
               defaultValue={this.state.email}
-              onChangeText={text => this.setState({ email: text })}
+              onChangeText={(text) => this.setState({ email: text })}
             />
             <Button gradient onPress={() => this.handleForgot()}>
               {loading ? (
                 <ActivityIndicator size="small" color="white" />
               ) : (
                 <Text bold white center>
-                  Forgot
+                  Recuperar
                 </Text>
               )}
             </Button>
@@ -94,7 +94,7 @@ export default class Forgot extends Component {
                 center
                 style={{ textDecorationLine: "underline" }}
               >
-                Back to Login
+                Voltar para o Login
               </Text>
             </Button>
           </Block>
@@ -107,15 +107,15 @@ export default class Forgot extends Component {
 const styles = StyleSheet.create({
   forgot: {
     flex: 1,
-    justifyContent: "center"
+    justifyContent: "center",
   },
   input: {
     borderRadius: 0,
     borderWidth: 0,
     borderBottomColor: theme.colors.gray2,
-    borderBottomWidth: StyleSheet.hairlineWidth
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   hasErrors: {
-    borderBottomColor: theme.colors.accent
-  }
+    borderBottomColor: theme.colors.accent,
+  },
 });

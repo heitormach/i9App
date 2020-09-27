@@ -17,9 +17,8 @@ import moment from "moment";
 const { width } = Dimensions.get("window");
 import { BarChart, Grid, YAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
-import { Picker } from "@react-native-community/picker";
 
-class FatMensal extends Component {
+class FatSemanal extends Component {
   state = {
     faturamentos: [],
     isDateTimePickerVisible: false,
@@ -208,7 +207,7 @@ class FatMensal extends Component {
         </Block>
         <Block flex={0.75} column middle>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Você realizou 53 serviços no mês
+            Você realizou 53 serviços na semana
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
             Valor Total Arrecadado: R$ 2.000,00
@@ -280,28 +279,18 @@ class FatMensal extends Component {
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
           <Text h1 bold>
-            Faturamento Mensal
+            Faturamento Semanal
           </Text>
           <Button onPress={() => navigation.navigate("Settings")}>
             <Image source={profile.avatar} style={styles.avatar} />
           </Button>
         </Block>
-        <Block flex={false} row space="between" style={styles.fatsHeader}>
-          <Picker
-            style={{
-              height: 50,
-              width: 200,
-              transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],
-            }}
-            selectedValue={this.state.mesSelected}
-            onValueChange={(v) => this.setState({ mesSelected: v })}
-            itemStyle={{ fontSize: 20 }}
-          >
-            {meses.map((mes) => (
-              <Picker.Item key={`mes-${mes}`} label={mes} value={mes} />
-            ))}
-          </Picker>
-        </Block>
+        <Block
+          flex={false}
+          row
+          space="between"
+          style={styles.fatsHeader}
+        ></Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
           {this.renderChart()}
           {this.renderFats()}
@@ -311,12 +300,12 @@ class FatMensal extends Component {
   }
 }
 
-FatMensal.defaultProps = {
+FatSemanal.defaultProps = {
   profile: mocks.profile,
   fats: mocks.fatMensal,
 };
 
-export default FatMensal;
+export default FatSemanal;
 
 const styles = StyleSheet.create({
   header: {

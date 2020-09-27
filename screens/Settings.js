@@ -12,7 +12,7 @@ class Settings extends Component {
     notifications: true,
     newsletter: false,
     editing: null,
-    profile: {}
+    profile: {},
   };
 
   componentDidMount() {
@@ -38,7 +38,7 @@ class Settings extends Component {
       return (
         <TextInput
           defaultValue={profile[name]}
-          onChangeText={text => this.handleEdit([name], text)}
+          onChangeText={(text) => this.handleEdit([name], text)}
         />
       );
     }
@@ -53,7 +53,7 @@ class Settings extends Component {
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
           <Text h1 bold>
-            Settings
+            Configurações
           </Text>
           <Button>
             <Image source={profile.avatar} style={styles.avatar} />
@@ -65,7 +65,7 @@ class Settings extends Component {
             <Block row space="between" margin={[10, 0]} style={styles.inputRow}>
               <Block>
                 <Text gray2 style={{ marginBottom: 10 }}>
-                  Username
+                  Usuário
                 </Text>
                 {this.renderEdit("username")}
               </Block>
@@ -74,22 +74,7 @@ class Settings extends Component {
                 secondary
                 onPress={() => this.toggleEdit("username")}
               >
-                {editing === "username" ? "Save" : "Edit"}
-              </Text>
-            </Block>
-            <Block row space="between" margin={[10, 0]} style={styles.inputRow}>
-              <Block>
-                <Text gray2 style={{ marginBottom: 10 }}>
-                  Location
-                </Text>
-                {this.renderEdit("location")}
-              </Block>
-              <Text
-                medium
-                secondary
-                onPress={() => this.toggleEdit("location")}
-              >
-                {editing === "location" ? "Save" : "Edit"}
+                {editing === "username" ? "Salvar" : "Editar"}
               </Text>
             </Block>
             <Block row space="between" margin={[10, 0]} style={styles.inputRow}>
@@ -107,7 +92,7 @@ class Settings extends Component {
           <Block style={styles.sliders}>
             <Block margin={[10, 0]}>
               <Text gray2 style={{ marginBottom: 10 }}>
-                Budget
+                Teste
               </Text>
               <Slider
                 minimumValue={0}
@@ -118,7 +103,7 @@ class Settings extends Component {
                 minimumTrackTintColor={theme.colors.secondary}
                 maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
                 value={this.state.budget}
-                onValueChange={value => this.setState({ budget: value })}
+                onValueChange={(value) => this.setState({ budget: value })}
               />
               <Text caption gray right>
                 $1,000
@@ -126,7 +111,7 @@ class Settings extends Component {
             </Block>
             <Block margin={[10, 0]}>
               <Text gray2 style={{ marginBottom: 10 }}>
-                Monthly Cap
+                Teste
               </Text>
               <Slider
                 minimumValue={0}
@@ -137,7 +122,7 @@ class Settings extends Component {
                 minimumTrackTintColor={theme.colors.secondary}
                 maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
                 value={this.state.monthly}
-                onValueChange={value => this.setState({ monthly: value })}
+                onValueChange={(value) => this.setState({ monthly: value })}
               />
               <Text caption gray right>
                 $5,000
@@ -154,23 +139,10 @@ class Settings extends Component {
               space="between"
               style={{ marginBottom: theme.sizes.base * 2 }}
             >
-              <Text gray2>Notifications</Text>
-              <Switch
-                value={this.state.notifications}
-                onValueChange={value => this.setState({ notifications: value })}
-              />
-            </Block>
-
-            <Block
-              row
-              center
-              space="between"
-              style={{ marginBottom: theme.sizes.base * 2 }}
-            >
-              <Text gray2>Newsletter</Text>
+              <Text gray2>Notificações</Text>
               <Switch
                 value={this.state.newsletter}
-                onValueChange={value => this.setState({ newsletter: value })}
+                onValueChange={(value) => this.setState({ newsletter: value })}
               />
             </Block>
           </Block>
@@ -181,29 +153,29 @@ class Settings extends Component {
 }
 
 Settings.defaultProps = {
-  profile: mocks.profile
+  profile: mocks.profile,
 };
 
 export default Settings;
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: theme.sizes.base * 2
+    paddingHorizontal: theme.sizes.base * 2,
   },
   avatar: {
     height: theme.sizes.base * 2.2,
-    width: theme.sizes.base * 2.2
+    width: theme.sizes.base * 2.2,
   },
   inputs: {
     marginTop: theme.sizes.base * 0.7,
-    paddingHorizontal: theme.sizes.base * 2
+    paddingHorizontal: theme.sizes.base * 2,
   },
   inputRow: {
-    alignItems: "flex-end"
+    alignItems: "flex-end",
   },
   sliders: {
     marginTop: theme.sizes.base * 0.7,
-    paddingHorizontal: theme.sizes.base * 2
+    paddingHorizontal: theme.sizes.base * 2,
   },
   thumb: {
     width: theme.sizes.base,
@@ -211,9 +183,9 @@ const styles = StyleSheet.create({
     borderRadius: theme.sizes.base,
     borderColor: "white",
     borderWidth: 3,
-    backgroundColor: theme.colors.secondary
+    backgroundColor: theme.colors.secondary,
   },
   toggles: {
-    paddingHorizontal: theme.sizes.base * 2
-  }
+    paddingHorizontal: theme.sizes.base * 2,
+  },
 });
