@@ -26,21 +26,23 @@ class Agendamento extends Component {
     showWeek: false,
     horaSelected: {},
     showTimePicker: false,
+    mesIni: moment(new Date()).format("YYYY-MM-DD"),
+    mesFim: moment(new Date()).format("YYYY-MM-DD"),
     meses: [
-      "Janeiro",
-      "Fevereiro",
-      "Março",
-      "Abril",
-      "Maio",
-      "Junho",
-      "Julho",
-      "Agosto",
-      "Setembro",
-      "Outubro",
-      "Novembro",
-      "Dezembro",
+      { nome: "Janeiro", numero: 1 },
+      { nome: "Fevereiro", numero: 2 },
+      { nome: "Março", numero: 3 },
+      { nome: "Abril", numero: 4 },
+      { nome: "Maio", numero: 5 },
+      { nome: "Junho", numero: 6 },
+      { nome: "Julho", numero: 7 },
+      { nome: "Agosto", numero: 8 },
+      { nome: "Setembro", numero: 9 },
+      { nome: "Outubro", numero: 10 },
+      { nome: "Novembro", numero: 11 },
+      { nome: "Dezembro", numero: 12 },
     ],
-    mesSelected: "Agosto",
+    mesSelected: new Date().getMonth() + 1,
     servicos: [],
     servicoSelected: "",
     diaSelected: moment(new Date()).format("DD/MM/YYYY"),
@@ -73,6 +75,11 @@ class Agendamento extends Component {
     } else {
       this.state.agenduramentoSelected.horaFim = new Date(date);
     }
+  }
+
+  onChangeMonth(month) {
+    this.setState({ mesSelected: month });
+    
   }
 
   onChange = (event, date) => {
@@ -360,7 +367,11 @@ class Agendamento extends Component {
             itemStyle={{ fontSize: 20 }}
           >
             {meses.map((mes) => (
-              <Picker.Item key={`mes-${mes}`} label={mes} value={mes} />
+              <Picker.Item
+                key={`mes-${mes.numero}`}
+                label={mes.nome}
+                value={mes.numero}
+              />
             ))}
           </Picker>
         </Block>

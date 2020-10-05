@@ -11,6 +11,7 @@ import {
 
 import { Button, Block, Text } from "../components";
 import { theme } from "../constants";
+import { AsyncStorage } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,6 +24,20 @@ class Welcome extends Component {
 
   state = {
     showTerms: false,
+    dadosLogin: {},
+  };
+
+  componentDidMount() {
+    this.getLoginData();
+  }
+
+  getLoginData = async () => {
+    const { navigation } = this.props;
+    const token = await AsyncStorage.getItem("@i9App:token");
+
+    if (token) {
+      navigation.navigate("Browse");
+    }
   };
 
   renderTermsService() {

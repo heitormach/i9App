@@ -9,6 +9,7 @@ import {
 
 import { Card, Badge, Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
+import apiNegocio from "../services/apiNegocio";
 
 const { width } = Dimensions.get("window");
 
@@ -16,6 +17,7 @@ class Servicos extends Component {
   state = {
     active: "Geral",
     servicos: [],
+    negocio: {},
   };
 
   componentDidMount() {

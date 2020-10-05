@@ -436,7 +436,7 @@ const planos = [
   },
   {
     id: 2,
-    nome: "Mento Mais - Individual",
+    nome: "Mentor Mais - Individual",
     preco: 30.0,
     descricao:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris bibendum justo quis quam dictum mollis molestie eget velit. Curabitur vestibulum ultricies pretium. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent vulputate fermentum magna, non sodales tellus congue quis. Curabitur vestibulum sollicitudin imperdiet. Sed laoreet varius fringilla. Vivamus ligula turpis, lobortis et ante et, facilisis luctus quam. In venenatis volutpat iaculis. Nulla tempor felis et rutrum sagittis. Phasellus ornare tincidunt hendrerit. Nam condimentum laoreet nisl, nec fermentum nisi ultricies vel.",

@@ -1,17 +1,14 @@
 import React, { Component } from "react";
-import { Button, Block, Text, Card } from "../components";
+import { Button, Block, Text, Card, Switch, Input } from "../components";
 import {
   ScrollView,
   Image,
   StyleSheet,
   Dimensions,
-  KeyboardAvoidingView,
-  TextInput,
   TouchableOpacity,
-  View,
+  Modal,
 } from "react-native";
 import { theme, mocks } from "../constants";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 // import { Container } from './styles';
 
 const { width } = Dimensions.get("window");
@@ -20,16 +17,126 @@ class Contatos extends Component {
   state = {
     active: "Geral",
     contatos: [],
+    estabelecimento: {},
     visibleModal: false,
+    contatoSelecionado: {},
   };
 
   componentDidMount = () => {
-    this.setState({ contatos: this.props.contatos });
+    // this.setState({ contatos: this.props.contatos });
   };
 
-  setModal = () => {
-    this.state.visibleModal = true;
+  setModal = (contatoSelecionado) => {
+    if (contatoSelecionado === {}) {
+      this.state.contatoSelecionado = {
+        ddd: null,
+        numero: null,
+        ind_whatsapp: false,
+      };
+    } else {
+      this.state.contatoSelecionado = contatoSelecionado;
+    }
+
+    console.log(contatoSelecionado);
+    this.setState({ visibleModal: true });
   };
+
+  renderContatoForm() {
+    const { contatoSelecionado } = this.state;
+    return (
+      <Modal
+        animationType="slide"
+        visible={this.state.visibleModal}
+        onRequestClose={() => this.setState({ visibleModal: false })}
+      >
+        <Block>
+          <Block flex={false} row center space="between" style={styles.header}>
+            <Text h1 bold>
+              Novo Contato
+            </Text>
+          </Block>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Block style={styles.inputs}>
+              <Input
+                label="DDD"
+                number
+                style={[styles.input]}
+                defaultValue={
+                  contatoSelecionado.ddd ? String(contatoSelecionado.ddd) : ""
+                }
+                onChangeText={(text) =>
+                  this.setState((prev) => ({
+                    contatoSelecionado: {
+                      ...prev.contatoSelecionado,
+                      ddd: text,
+                    },
+                  }))
+                }
+              />
+              <Input
+                label="Número"
+                number
+                style={[styles.input]}
+                defaultValue={
+                  contatoSelecionado.numero
+                    ? String(contatoSelecionado.numero)
+                    : ""
+                }
+                onChangeText={(text) =>
+                  this.setState((prev) => ({
+                    contatoSelecionado: {
+                      ...prev.contatoSelecionado,
+                      numero: text,
+                    },
+                  }))
+                }
+              />
+              <Block style={styles.toggles}>
+                <Block
+                  row
+                  center
+                  space="between"
+                  style={{ marginBottom: theme.sizes.base * 2 }}
+                >
+                  <Text gray2>Este número é WhatsApp</Text>
+                  <Switch
+                    value={contatoSelecionado.ind_whatsapp}
+                    onValueChange={(value) =>
+                      this.setState((prev) => ({
+                        contatoSelecionado: {
+                          ...prev.contatoSelecionado,
+                          ind_whatsapp: value,
+                        },
+                      }))
+                    }
+                  />
+                </Block>
+              </Block>
+              <Block middle padding={[theme.sizes.base / 2, 0]}>
+                <Button
+                  gradient
+                  onPress={() => this.setState({ visibleModal: false })}
+                >
+                  <Text center white>
+                    Salvar
+                  </Text>
+                </Button>
+                <Button
+                  color="accent"
+                  onPress={() => this.setState({ visibleModal: false })}
+                >
+                  <Text center white>
+                    Voltar
+                  </Text>
+                </Button>
+              </Block>
+            </Block>
+          </ScrollView>
+        </Block>
+      </Modal>
+    );
+  }
 
   render() {
     const { profile, navigation } = this.props;
@@ -45,26 +152,17 @@ class Contatos extends Component {
             <Image source={profile.avatar} style={styles.avatar} />
           </Button>
         </Block>
-        <KeyboardAvoidingView>
-          <View style={styles.Form}>
-            <TextInput
-              style={styles.Input}
-              placeholderTextColor="#999"
-              autoCorrect={true}
-              placeholder="Pesquisar"
-              maxLength={25}
-            />
-            <TouchableOpacity style={styles.Button}>
-              <Ionicons name="ios-add" size={20} color="white" />
-            </TouchableOpacity>
-          </View>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ paddingVertical: theme.sizes.base * 2 }}
-          >
-            <Block flex={false} row space="between" style={styles.contatos}>
-              {contatos.map((contato) => (
-                <TouchableOpacity key={contato.numero}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ paddingVertical: theme.sizes.base * 2 }}
+        >
+          <Block flex={false} row space="between" style={styles.contatos}>
+            {contatos.length > 0 &&
+              contatos.map((contato) => (
+                <TouchableOpacity
+                  onPress={() => this.setModal(contato)}
+                  key={contato.numero}
+                >
                   <Card center middle shadow style={styles.contato}>
                     <Text center medium height={20}>
                       {contato.ddd} - {contato.numero}
@@ -77,9 +175,23 @@ class Contatos extends Component {
                   </Card>
                 </TouchableOpacity>
               ))}
-            </Block>
-          </ScrollView>
-        </KeyboardAvoidingView>
+            {contatos.length === 0 && (
+              <Block>
+                <Text style={{ marginBottom: 50 }} center medium height={20}>
+                  Aqui você pode cadastrar números para os clientes entrarem
+                  em contato com você!
+                </Text>
+                <Text center medium height={20}>
+                  Clique no + para criar um novo.
+                </Text>
+              </Block>
+            )}
+          </Block>
+        </ScrollView>
+        <TouchableOpacity onPress={() => this.setModal({})} style={styles.fab}>
+          <Text style={styles.fabIcon}>+</Text>
+        </TouchableOpacity>
+        {this.renderContatoForm()}
       </Block>
     );
   }
@@ -87,7 +199,6 @@ class Contatos extends Component {
 
 Contatos.defaultProps = {
   profile: mocks.profile,
-  contatos: mocks.contatos,
 };
 
 export default Contatos;
@@ -95,6 +206,8 @@ export default Contatos;
 const styles = StyleSheet.create({
   header: {
     paddingHorizontal: theme.sizes.base * 2,
+    borderBottomWidth: 1,
+    borderColor: "#eee",
   },
   avatar: {
     height: theme.sizes.base * 2.2,
@@ -108,35 +221,6 @@ const styles = StyleSheet.create({
   inputs: {
     marginTop: theme.sizes.base * 0.7,
     paddingHorizontal: theme.sizes.base * 2,
-  },
-  Form: {
-    padding: theme.sizes.base * 2,
-    height: 60,
-    justifyContent: "center",
-    alignSelf: "stretch",
-    flexDirection: "row",
-    paddingTop: 13,
-    borderTopWidth: 1,
-    borderColor: "#eee",
-  },
-  Input: {
-    flex: 1,
-    height: 40,
-    backgroundColor: "#eee",
-    borderRadius: 4,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-  Button: {
-    height: 40,
-    width: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#1c6cce",
-    borderRadius: 4,
-    marginLeft: 10,
   },
   FlatList: {
     flex: 1,
@@ -154,17 +238,35 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
   },
+  fab: {
+    position: "absolute",
+    width: 56,
+    height: 56,
+    alignItems: "center",
+    justifyContent: "center",
+    right: 20,
+    bottom: 20,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 30,
+    elevation: 8,
+  },
+  fabIcon: {
+    fontSize: 40,
+    color: "white",
+  },
   contato: {
     // this should be dynamic based on screen width
     minWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
     maxWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
     maxHeight: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
   },
-  Texto: {
-    fontSize: 14,
-    color: "#333",
-    fontWeight: "bold",
-    marginTop: 4,
-    textAlign: "center",
+  input: {
+    borderRadius: 0,
+    borderWidth: 0,
+    borderBottomColor: theme.colors.gray2,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  toggles: {
+    paddingHorizontal: theme.sizes.base * 2,
   },
 });

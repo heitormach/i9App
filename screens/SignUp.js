@@ -10,10 +10,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+import { AsyncStorage } from "react-native";
+
 import { Button, Block, Input, Text, Switch } from "../components";
 import { theme } from "../constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import api from "../services/api";
+import apiUsuario from "../services/apiUsuario";
 import moment from "moment";
 const { width } = Dimensions.get("window");
 
@@ -22,6 +24,7 @@ export default class SignUp extends Component {
     email: null,
     username: null,
     password: null,
+    c_password: null,
     errors: [],
     loading: false,
     contato: {
@@ -55,6 +58,7 @@ export default class SignUp extends Component {
     const currentDate = date;
     this.setState({
       data_nascimento: moment(new Date(date)).format("DD/MM/YYYY"),
+      data_dateTime: moment(new Date(date)).format("DD/MM/YYYY"),
     });
   };
 
@@ -71,29 +75,24 @@ export default class SignUp extends Component {
     this.setState({ mode: "date" });
   };
 
-  handleSignUp = async () => {
+  handleLogin = async () => {
     const { navigation } = this.props;
+    const { dados_login, tipo_usuario } = this.state;
     try {
       this.setState({ loading: true });
 
-      const response = await api.post("/usuarios", {
-        contato: {
-          celular: {
-            ddd: this.state.contato.celular.ddd,
-            ind_whatsapp: this.state.ind_whatsapp,
-            numero: this.state.contato.celular.numero,
-          },
-          email: this.state.email,
+      const response = await apiUsuario.post("/usuarios/token", null, {
+        params: {
+          login: dados_login.login,
+          senha: dados_login.senha,
+          tipo_usuario: tipo_usuario,
         },
-        cpf: this.state.cpf,
-        dados_login: {
-          login: this.state.email,
-          senha: this.state.dados_login.senha,
-        },
-        data_nascimento: this.state.data_nascimento,
-        nome_completo: this.state.nome_completo,
-        tipo_usuario: "PRESTADOR",
       });
+
+      await AsyncStorage.multiSet([
+        ["@i9App:token", JSON.stringify(response.data.token)],
+        ["@i9App:user", JSON.stringify(response.data)],
+      ]);
 
       Keyboard.dismiss();
 
@@ -101,9 +100,52 @@ export default class SignUp extends Component {
 
       navigation.navigate("Browse");
     } catch (err) {
-      Alert.alert("ERRO", "Erro ao realizar cadastro");
+      console.log(err);
       this.setState({ loading: false });
-      navigation.navigate("Browse");
+    }
+  };
+
+  handleSignUp = async () => {
+    const { navigation } = this.props;
+    if (this.state.dados_login.senha !== this.state.c_password) {
+      Alert.alert("ERRO", "As duas senhas devem ser iguais");
+    } else {
+      try {
+        this.setState({ loading: true });
+
+        const response = await apiUsuario.post("/usuarios", {
+          contato: {
+            celular: {
+              ddd: this.state.contato.celular.ddd,
+              ind_whatsapp: this.state.ind_whatsapp,
+              numero: this.state.contato.celular.numero,
+            },
+            email: this.state.email,
+          },
+          cpf: this.state.cpf,
+          dados_login: {
+            login: this.state.email,
+            senha: this.state.dados_login.senha,
+          },
+          data_nascimento: moment(new Date(this.state.data_datetime)).format(
+            "YYYY-MM-DD"
+          ),
+          nome_completo: this.state.nome_completo,
+          tipo_usuario: "PRESTADOR",
+        });
+
+        Keyboard.dismiss();
+
+        this.setState({ loading: false });
+
+        this.handleLogin();
+
+        // navigation.navigate("Browse");
+      } catch (err) {
+        console.log(err);
+        Alert.alert("ERRO", err.data.mensagem);
+        this.setState({ loading: false });
+      }
     }
   };
 
@@ -202,6 +244,14 @@ export default class SignUp extends Component {
               style={[styles.input, hasErrors("password")]}
               defaultValue={this.state.senha}
               onChangeText={(text) => (this.state.dados_login.senha = text)}
+            />
+            <Input
+              secure
+              label="Confirmar Senha"
+              error={hasErrors("c_password")}
+              style={[styles.input, hasErrors("c_password")]}
+              defaultValue={this.state.c_password}
+              onChangeText={(text) => (this.state.c_password = text)}
             />
             <Button gradient onPress={() => this.handleSignUp()}>
               {loading ? (

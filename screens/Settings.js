@@ -87,49 +87,6 @@ class Settings extends Component {
             </Block>
           </Block>
 
-          <Divider margin={[theme.sizes.base, theme.sizes.base * 2]} />
-
-          <Block style={styles.sliders}>
-            <Block margin={[10, 0]}>
-              <Text gray2 style={{ marginBottom: 10 }}>
-                Teste
-              </Text>
-              <Slider
-                minimumValue={0}
-                maximumValue={1000}
-                style={{ height: 19 }}
-                thumbStyle={styles.thumb}
-                trackStyle={{ height: 6, borderRadius: 6 }}
-                minimumTrackTintColor={theme.colors.secondary}
-                maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
-                value={this.state.budget}
-                onValueChange={(value) => this.setState({ budget: value })}
-              />
-              <Text caption gray right>
-                $1,000
-              </Text>
-            </Block>
-            <Block margin={[10, 0]}>
-              <Text gray2 style={{ marginBottom: 10 }}>
-                Teste
-              </Text>
-              <Slider
-                minimumValue={0}
-                maximumValue={5000}
-                style={{ height: 19 }}
-                thumbStyle={styles.thumb}
-                trackStyle={{ height: 6, borderRadius: 6 }}
-                minimumTrackTintColor={theme.colors.secondary}
-                maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
-                value={this.state.monthly}
-                onValueChange={(value) => this.setState({ monthly: value })}
-              />
-              <Text caption gray right>
-                $5,000
-              </Text>
-            </Block>
-          </Block>
-
           <Divider />
 
           <Block style={styles.toggles}>

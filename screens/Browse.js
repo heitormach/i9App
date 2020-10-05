@@ -5,23 +5,73 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 
 import { Card, Badge, Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
+import { AsyncStorage } from "react-native";
+import apiUsuario from "../services/apiUsuario";
 
 const { width } = Dimensions.get("window");
 
 class Browse extends Component {
+  static navigationOptions = {
+    header: null,
+  };
+
   state = {
     active: "Menu",
     categories: [],
+    usuario: "",
   };
 
   componentDidMount() {
     this.setState({ categories: this.props.categories });
+    this.buscarDadosUser();
   }
 
+  logoutAlert() {
+    Alert.alert("Sair da Conta", "Deseja realmente sair?", [
+      {
+        text: "Não",
+        onPress: () => console.log("Não Sair"),
+        style: "cancel",
+      },
+      {
+        text: "Sair",
+        onPress: () => this.logout(),
+      },
+    ]);
+  }
+  logout = async () => {
+    const { navigation } = this.props;
+    await AsyncStorage.removeItem("@i9App:userDados");
+    await AsyncStorage.removeItem("@i9App:token");
+
+    navigation.navigate("Welcome");
+  };
+
+  buscarDadosUser = async () => {
+    const usuario = await AsyncStorage.getItem("@i9App:userDados");
+    if (usuario !== null) {
+      this.setState({ usuario: JSON.parse(usuario) });
+    } else {
+      try {
+        const response = await apiUsuario.get("/usuarios", {
+          findByToken: "true",
+        });
+
+        this.setState({ usuario: response.data });
+        await AsyncStorage.multiSet([
+          ["@i9App:userDados", JSON.stringify(response.data)],
+        ]);
+      } catch (err) {
+        Alert.alert("ERRO", "Erro ao buscar informações do usuário");
+        console.log(err.data.message);
+      }
+    }
+  };
   handleTab = (tab) => {
     const { categories } = this.props;
     const filtered = categories.filter((category) =>
@@ -57,7 +107,7 @@ class Browse extends Component {
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
           <Text h1 bold>
-            Olá, Heitor
+            Olá, {this.state.usuario.nome_completo}
           </Text>
           <Button onPress={() => navigation.navigate("Settings")}>
             <Image source={profile.avatar} style={styles.avatar} />
@@ -78,7 +128,13 @@ class Browse extends Component {
                 key={category.name}
                 onPress={() => navigation.navigate(category.screen)}
               >
-                <Card center middle shadow style={styles.category}>
+                <Card
+                  color="#fffcfc"
+                  center
+                  middle
+                  shadow
+                  style={styles.category}
+                >
                   <Badge margin={[0, 0, 15]} size={40}>
                     <Image source={category.image} />
                   </Badge>
@@ -88,6 +144,20 @@ class Browse extends Component {
                 </Card>
               </TouchableOpacity>
             ))}
+            <TouchableOpacity key={"logout"} onPress={() => this.logoutAlert()}>
+              <Card
+                color="#fffcfc"
+                center
+                middle
+                shadow
+                style={styles.category}
+              >
+                <Badge margin={[0, 0, 15]} size={40}></Badge>
+                <Text medium height={20}>
+                  Sair
+                </Text>
+              </Card>
+            </TouchableOpacity>
           </Block>
         </ScrollView>
       </Block>
@@ -105,6 +175,7 @@ export default Browse;
 const styles = StyleSheet.create({
   header: {
     paddingHorizontal: theme.sizes.base * 2,
+    paddingVertical: theme.sizes.base * 3,
   },
   avatar: {
     height: theme.sizes.base * 2.2,
@@ -113,7 +184,6 @@ const styles = StyleSheet.create({
   tabs: {
     borderBottomColor: theme.colors.gray2,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    marginVertical: theme.sizes.base,
     marginHorizontal: theme.sizes.base * 2,
   },
   tab: {

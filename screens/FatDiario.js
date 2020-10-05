@@ -14,6 +14,7 @@ import { Button, Block, Text, Switch } from "../components";
 import { theme, mocks } from "../constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
+import "moment/locale/pt";
 const { width } = Dimensions.get("window");
 import { BarChart, Grid, YAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
@@ -30,6 +31,7 @@ class FatDiario extends Component {
 
   componentDidMount() {
     this.setState({ fats: this.props.fats });
+    moment().locale("pt");
   }
 
   selectWeekDay(faturamento) {
@@ -186,7 +188,7 @@ class FatDiario extends Component {
         <Block flex={false} row space="between" style={styles.fatsHeader}>
           <TouchableOpacity onPress={() => this.showDatePicker()}>
             <Text center h1 bold>
-              {moment(this.state.dataSelected).format("DD MMMM YYYY")}
+              {moment(this.state.dataSelected).format("LL")}
             </Text>
           </TouchableOpacity>
           {this.state.showDatePicker && (

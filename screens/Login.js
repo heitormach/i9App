@@ -10,7 +10,8 @@ import {
 import { Button, Block, Input, Text } from "../components";
 import { theme } from "../constants";
 import { ScrollView } from "react-native-gesture-handler";
-import { api } from "../services/api";
+import apiUsuario from "../services/apiUsuario";
+import { AsyncStorage } from "react-native";
 
 export default class Login extends Component {
   state = {
@@ -27,7 +28,7 @@ export default class Login extends Component {
     try {
       this.setState({ loading: true });
 
-      const response = await api.post("/usuario/token", null, {
+      const response = await apiUsuario.post("/usuarios/token", null, {
         params: {
           login: login,
           senha: senha,
@@ -36,7 +37,7 @@ export default class Login extends Component {
       });
 
       await AsyncStorage.multiSet([
-        ["@i9App:token", token],
+        ["@i9App:token", JSON.stringify(response.data.token)],
         ["@i9App:user", JSON.stringify(response.data)],
       ]);
 
@@ -46,9 +47,9 @@ export default class Login extends Component {
 
       navigation.navigate("Browse");
     } catch (err) {
-      Alert.alert("ERRO", "Erro ao realizar login");
+      Alert.alert("ERRO", err.data.mensagem);
+      console.log(err);
       this.setState({ loading: false });
-      navigation.navigate("Browse");
     }
   };
 
@@ -68,7 +69,7 @@ export default class Login extends Component {
           <Block style={styles.inputs}>
             <Input
               label="Email"
-              error={hasErrors("email")}
+              error={hasErrors("login")}
               style={[styles.input]}
               defaultValue={""}
               onChangeText={(text) => this.setState({ login: text })}
@@ -76,7 +77,7 @@ export default class Login extends Component {
             <Input
               secure
               label="Senha"
-              error={hasErrors("password")}
+              error={hasErrors("login")}
               style={[styles.input]}
               defaultValue={""}
               onChangeText={(text) => this.setState({ senha: text })}
