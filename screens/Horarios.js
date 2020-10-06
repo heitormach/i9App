@@ -7,13 +7,16 @@ import {
   Image,
   KeyboardAvoidingView,
   Modal,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 
-import { Card, Badge, Button, Block, Text, Switch } from "../components";
+import { Card, Button, Block, Text, Switch } from "../components";
 import { theme, mocks } from "../constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 const { width } = Dimensions.get("window");
+import apiNegocio from "../services/apiNegocio";
 
 class Horarios extends Component {
   state = {
@@ -23,15 +26,47 @@ class Horarios extends Component {
     showWeek: false,
     horaSelected: {},
     showTimePicker: false,
+    loading: false,
   };
 
   componentDidMount() {
-    this.setState({ horarios: this.props.horarios });
+    this.getHorarios();
   }
 
   selectWeekDay(horario) {
     this.setState({ horarioSelected: horario, showWeek: true });
   }
+
+  getHorarios = async () => {
+    try {
+      const response = await apiNegocio.get("estabelecimento/atendimento");
+
+      this.setState({ horarios: response.data });
+    } catch (err) {
+      console.log(err.data);
+    }
+  };
+
+  saveHorarios = async () => {
+    const { horarioSelected } = this.state;
+    try {
+      this.setState({ loading: true });
+      const response = await apiNegocio.patch(
+        "estabelecimento/atendimento",
+        horarioSelected
+      );
+
+      this.setState({ loading: false, showWeek: false });
+
+      Alert.alert("Salvo", "Dados atualizados");
+      console.log(response);
+      this.getHorarios();
+    } catch (err) {
+      Alert.alert("Erro", JSON.stringify(err.data));
+      this.setState({ loading: false });
+      console.log(err);
+    }
+  };
 
   horaSelected(horario, tipo) {
     this.setState({
@@ -41,22 +76,38 @@ class Horarios extends Component {
   }
 
   handleTime(event, date, tipo) {
-    console.log("passou");
     this.setState({ showTimePicker: false });
     if (date) {
       if (tipo === "ini") {
-        this.state.horarioSelected.horaIni = new Date(date);
+        this.setState((prev) => ({
+          horarioSelected: {
+            ...prev.horarioSelected,
+            inicio_atendimento: moment(new Date(date)).format("HH:mm"),
+          },
+        }));
       } else {
-        this.state.horarioSelected.horaFim = new Date(date);
+        this.setState((prev) => ({
+          horarioSelected: {
+            ...prev.horarioSelected,
+            fim_atendimento: moment(new Date(date)).format("HH:mm"),
+          },
+        }));
       }
     }
   }
 
   renderSelectTimeWeek() {
+    const {
+      loading,
+      horarioSelected,
+      showWeek,
+      showTimePicker,
+      horaSelected,
+    } = this.state;
     return (
       <Modal
         animationType="slide"
-        visible={this.state.showWeek}
+        visible={showWeek}
         onRequestClose={() => this.setState({ showWeek: false })}
       >
         <Block
@@ -64,12 +115,12 @@ class Horarios extends Component {
           space="between"
         >
           <Text h2 light>
-            {this.state.horarioSelected.name}
+            {horarioSelected.dia_semana}
           </Text>
           <ScrollView style={{ marginVertical: theme.sizes.padding }}>
             <TouchableOpacity
               onPress={() =>
-                this.horaSelected(this.state.horarioSelected.horaIni, "ini")
+                this.horaSelected(horarioSelected.inicio_atendimento, "ini")
               }
             >
               <Text h2 light size={15}>
@@ -77,33 +128,29 @@ class Horarios extends Component {
               </Text>
               <Text style={{ marginBottom: theme.sizes.base }} bold>
                 {" "}
-                {moment(new Date(this.state.horarioSelected.horaIni)).format(
-                  "HH:mm"
-                )}
+                {horarioSelected.inicio_atendimento}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
-                this.horaSelected(this.state.horarioSelected.horaFim, "fim")
+                this.horaSelected(horarioSelected.fim_atendimento, "fim")
               }
             >
               <Text h2 light size={15}>
                 Horário de Término:
               </Text>
               <Text style={{ marginBottom: theme.sizes.base }} bold>
-                {moment(new Date(this.state.horarioSelected.horaFim)).format(
-                  "HH:mm"
-                )}
+                {horarioSelected.fim_atendimento}
               </Text>
             </TouchableOpacity>
-            {this.state.showTimePicker && (
+            {showTimePicker && (
               <DateTimePicker
-                value={new Date(this.state.horaSelected.hora)}
+                value={new Date("01/01/2020 " + horaSelected.hora)}
                 mode="time"
                 is24Hour={true}
                 display="default"
                 onChange={(event, date) =>
-                  this.handleTime(event, date, this.state.horaSelected.tipo)
+                  this.handleTime(event, date, horaSelected.tipo)
                 }
                 on
               />
@@ -114,19 +161,36 @@ class Horarios extends Component {
               space="between"
               style={{ marginBottom: theme.sizes.base * 2 }}
             >
-              <Text gray2>Não trabalho</Text>
+              <Text gray2>Trabalho neste dia</Text>
               <Switch
-                value={this.state.horarioSelected.naoTrab}
+                value={horarioSelected.aberto}
                 onValueChange={(value) =>
-                  (this.state.horarioSelected.naoTrab = value)
+                  this.setState((prev) => ({
+                    horarioSelected: {
+                      ...prev.horarioSelected,
+                      aberto: value,
+                    },
+                  }))
                 }
               />
             </Block>
           </ScrollView>
           <Block middle padding={[theme.sizes.base / 2, 0]}>
-            <Button gradient onPress={() => this.setState({ showWeek: false })}>
+            <Button gradient onPress={() => this.saveHorarios()}>
+              {loading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text bold white center>
+                  Salvar
+                </Text>
+              )}
+            </Button>
+            <Button
+              color="orange"
+              onPress={() => this.setState({ showWeek: false })}
+            >
               <Text center white>
-                Salvar
+                Voltar
               </Text>
             </Button>
           </Block>
@@ -139,8 +203,8 @@ class Horarios extends Component {
     const { profile, navigation } = this.props;
     const { horarios } = this.state;
     let horaRender;
-    const naoTrab = (horario) => {
-      if (horario.naoTrab) {
+    const aberto = (horario) => {
+      if (!horario.aberto) {
         horaRender = (
           <Text medium height={20}>
             Não trabalho
@@ -149,8 +213,7 @@ class Horarios extends Component {
       } else {
         horaRender = (
           <Text medium height={20}>
-            {moment(new Date(horario.horaIni)).format("HH:mm")} até{" "}
-            {moment(new Date(horario.horaFim)).format("HH:mm")}
+            {horario.inicio_atendimento} até {horario.fim_atendimento}
           </Text>
         );
       }
@@ -174,13 +237,13 @@ class Horarios extends Component {
               {horarios.map((horario) => (
                 <TouchableOpacity
                   onPress={() => this.selectWeekDay(horario)}
-                  key={horario.name}
+                  key={horario.dia_semana}
                 >
                   <Card center middle shadow style={styles.horario}>
                     <Text medium height={20}>
-                      {horario.name}
+                      {horario.dia_semana}
                     </Text>
-                    {naoTrab(horario)}
+                    {aberto(horario)}
                     {horaRender}
                   </Card>
                 </TouchableOpacity>
@@ -196,7 +259,6 @@ class Horarios extends Component {
 
 Horarios.defaultProps = {
   profile: mocks.profile,
-  horarios: mocks.dayWeek,
 };
 
 export default Horarios;

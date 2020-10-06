@@ -51,6 +51,14 @@ const categories = [
 
 const servicos = [
   {
+    id: "negocio",
+    name: "Dados do Negócio",
+    tags: ["geral"],
+    screen: "Negocio",
+    count: 147,
+    image: require("../assets/icons/contatos.png"),
+  },
+  {
     id: "contatos",
     name: "Contatos",
     tags: ["geral"],
@@ -63,6 +71,14 @@ const servicos = [
     name: "Horários de Atendimento",
     tags: ["geral"],
     screen: "Horarios",
+    count: 16,
+    image: require("../assets/icons/relogio.png"),
+  },
+  {
+    id: "endereco",
+    name: "Endereço",
+    tags: ["geral"],
+    screen: "Endereco",
     count: 16,
     image: require("../assets/icons/relogio.png"),
   },

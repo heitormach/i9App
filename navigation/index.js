@@ -24,6 +24,8 @@ import Agendamento from "../screens/Agendamento";
 import ServicosDia from "../screens/ServicosDia";
 import Planos from "../screens/Planos";
 import Estudo from "../screens/Estudo";
+import Negocio from "../screens/Negocio";
+import Endereco from "../screens/Endereco";
 
 import { theme } from "../constants";
 
@@ -50,6 +52,8 @@ const screens = createStackNavigator(
     ServicosDia,
     Planos,
     Estudo,
+    Negocio,
+    Endereco,
   },
   {
     defaultNavigationOptions: {

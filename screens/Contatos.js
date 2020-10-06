@@ -7,11 +7,15 @@ import {
   Dimensions,
   TouchableOpacity,
   Modal,
+  Alert,
+  ActivityIndicator,
+  Keyboard,
 } from "react-native";
 import { theme, mocks } from "../constants";
 // import { Container } from './styles';
 
 const { width } = Dimensions.get("window");
+import apiNegocio from "../services/apiNegocio";
 
 class Contatos extends Component {
   state = {
@@ -20,29 +24,115 @@ class Contatos extends Component {
     estabelecimento: {},
     visibleModal: false,
     contatoSelecionado: {},
+    contatoNovo: false,
+    loading: false,
   };
 
   componentDidMount = () => {
     // this.setState({ contatos: this.props.contatos });
+    this.getContatos();
+  };
+
+  getContatos = async () => {
+    try {
+      const response = await apiNegocio.get("/estabelecimento/contato");
+
+      this.setState({ contatos: response.data });
+      console.log(response.data);
+    } catch (err) {
+      Alert.alert("Erro ao buscar contatos", err.data);
+      console.log(err);
+    }
+  };
+
+  saveContato = async () => {
+    const { contatoSelecionado } = this.state;
+    try {
+      this.setState({ loading: true });
+
+      const response = await apiNegocio.post(
+        "/estabelecimento/contato",
+        contatoSelecionado
+      );
+
+      Keyboard.dismiss();
+
+      this.setState({ loading: false, visibleModal: false });
+
+      Alert.alert("Salvo!", "Contato salvo com sucesso!");
+
+      this.getContatos();
+    } catch (err) {
+      Alert.alert("ERRO", err);
+      console.log(err);
+      this.setState({ loading: false });
+    }
+  };
+
+  deleteAlert() {
+    const { contatoSelecionado } = this.state;
+    Alert.alert(
+      "Excluir contato",
+      "Deseja realmente excluir o contato " +
+        contatoSelecionado.ddd +
+        " - " +
+        contatoSelecionado.numero +
+        "?",
+      [
+        {
+          text: "Não",
+          onPress: () => console.log("Não excluir"),
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          onPress: () => this.deleteContato(),
+        },
+      ]
+    );
+  }
+
+  deleteContato = async () => {
+    const { contatoSelecionado } = this.state;
+
+    try {
+      this.setState({ loading: true });
+
+      const response = await apiNegocio.delete(
+        "/estabelecimento/contato/" + contatoSelecionado.id
+      );
+
+      Alert.alert("Excluído", "Contato excluído com sucesso!");
+
+      this.setState({ loading: false, visibleModal: false });
+
+      this.getContatos();
+    } catch (err) {
+      Alert.alert("ERRO", JSON.stringify(err.data));
+      console.log(err);
+      this.setState({ loading: false });
+    }
   };
 
   setModal = (contatoSelecionado) => {
-    if (contatoSelecionado === {}) {
+    console.log(JSON.stringify(contatoSelecionado));
+    if (JSON.stringify(contatoSelecionado) === "{}") {
+      this.setState({ contatoNovo: true });
       this.state.contatoSelecionado = {
+        id: null,
         ddd: null,
         numero: null,
         ind_whatsapp: false,
       };
     } else {
       this.state.contatoSelecionado = contatoSelecionado;
+      this.setState({ contatoNovo: false });
     }
-
-    console.log(contatoSelecionado);
     this.setState({ visibleModal: true });
   };
 
   renderContatoForm() {
-    const { contatoSelecionado } = this.state;
+    const { contatoSelecionado, loading, contatoNovo } = this.state;
     return (
       <Modal
         animationType="slide"
@@ -114,16 +204,28 @@ class Contatos extends Component {
                 </Block>
               </Block>
               <Block middle padding={[theme.sizes.base / 2, 0]}>
-                <Button
-                  gradient
-                  onPress={() => this.setState({ visibleModal: false })}
-                >
-                  <Text center white>
-                    Salvar
-                  </Text>
+                <Button gradient onPress={() => this.saveContato()}>
+                  {loading ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text bold white center>
+                      Salvar
+                    </Text>
+                  )}
                 </Button>
+                {!contatoNovo && (
+                  <Button color="accent" onPress={() => this.deleteAlert()}>
+                    {loading ? (
+                      <ActivityIndicator size="small" color="white" />
+                    ) : (
+                      <Text bold white center>
+                        Excluir
+                      </Text>
+                    )}
+                  </Button>
+                )}
                 <Button
-                  color="accent"
+                  color="orange"
                   onPress={() => this.setState({ visibleModal: false })}
                 >
                   <Text center white>
@@ -161,7 +263,7 @@ class Contatos extends Component {
               contatos.map((contato) => (
                 <TouchableOpacity
                   onPress={() => this.setModal(contato)}
-                  key={contato.numero}
+                  key={contato.id}
                 >
                   <Card center middle shadow style={styles.contato}>
                     <Text center medium height={20}>
@@ -178,8 +280,8 @@ class Contatos extends Component {
             {contatos.length === 0 && (
               <Block>
                 <Text style={{ marginBottom: 50 }} center medium height={20}>
-                  Aqui você pode cadastrar números para os clientes entrarem
-                  em contato com você!
+                  Aqui você pode cadastrar números para os clientes entrarem em
+                  contato com você!
                 </Text>
                 <Text center medium height={20}>
                   Clique no + para criar um novo.
