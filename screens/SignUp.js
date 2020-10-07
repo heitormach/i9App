@@ -188,6 +188,7 @@ export default class SignUp extends Component {
               style={[styles.input, hasErrors("cpf")]}
               defaultValue={this.state.cpf}
               onChangeText={(text) => this.setState({ cpf: text })}
+              maxLength={11}
             />
             <TouchableOpacity onPress={() => this.showDatepicker()}>
               <Text gray2>Data de Nascimento</Text>
@@ -207,6 +208,7 @@ export default class SignUp extends Component {
               style={[styles.input]}
               defaultValue={this.state.contato.celular.ddd}
               onChangeText={(text) => (this.state.contato.celular.ddd = text)}
+              maxLength={2}
             />
             <Input
               number
@@ -216,6 +218,7 @@ export default class SignUp extends Component {
               onChangeText={(text) =>
                 (this.state.contato.celular.numero = text)
               }
+              maxLength={9}
             />
             <Block
               row

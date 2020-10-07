@@ -31,7 +31,6 @@ class Negocio extends Component {
     try {
       this.setState({ usuario: usuario, loading: true });
       const response = await apiNegocio.get("estabelecimento/" + usuario.cpf);
-
       if (response.data) {
         this.setState({ negocio: response.data });
       } else {
@@ -105,20 +104,6 @@ class Negocio extends Component {
                       negocio: {
                         ...prev.negocio,
                         nome: text,
-                      },
-                    }))
-                  }
-                />
-                <Input
-                  label="CPF"
-                  number
-                  style={[styles.input]}
-                  defaultValue={negocio.cpf_proprietario}
-                  onChangeText={(text) =>
-                    this.setState((prev) => ({
-                      negocio: {
-                        ...prev.negocio,
-                        cpf_proprietario: text,
                       },
                     }))
                   }

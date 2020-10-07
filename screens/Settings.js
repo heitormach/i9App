@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Image, StyleSheet, ScrollView, TextInput } from "react-native";
 import Slider from "react-native-slider";
 import moment from "moment";
-import { Divider, Button, Block, Text, Switch } from "../components";
+import { Divider, Button, Block, Text, Switch, Input } from "../components";
 import { theme, mocks } from "../constants";
 import { AsyncStorage } from "react-native";
 
@@ -80,13 +80,11 @@ class Settings extends Component {
             <Input
               email
               label="Email"
-              error={hasErrors("email")}
-              style={[styles.input, hasErrors("email")]}
+              style={[styles.input]}
               defaultValue={usuario.email}
               onChangeText={(text) => {
                 usuario.email = text;
-                usuario.contato.email = text;
-                usuario.n.login = text;
+                usuario.dados_login.login = text;
               }}
             />
           </Block>

@@ -243,7 +243,7 @@ class Services extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { servicos } = this.state;
+    const { servicos, loading } = this.state;
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>

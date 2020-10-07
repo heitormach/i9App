@@ -97,8 +97,15 @@ class Agendamento extends Component {
   componentDidMount() {
     //  this.setState({ agends: this.props.agends });
     const { dataInicio, dataFim } = this.state;
+    const { navigation } = this.props;
+
     this.getAgendamentos("", dataInicio, dataFim);
     this.getServicos();
+
+    navigation.addListener("willFocus", () => {
+      this.getAgendamentos("", dataInicio, dataFim);
+      this.getServicos();
+    });
   }
 
   convertData(date) {
