@@ -56,7 +56,7 @@ const servicos = [
     tags: ["geral"],
     screen: "Negocio",
     count: 147,
-    image: require("../assets/icons/contatos.png"),
+    image: require("../assets/icons/dados_negocio.png"),
   },
   {
     id: "contatos",
@@ -75,20 +75,20 @@ const servicos = [
     image: require("../assets/icons/relogio.png"),
   },
   {
-    id: "endereco",
-    name: "Endereço",
-    tags: ["geral"],
-    screen: "Endereco",
-    count: 16,
-    image: require("../assets/icons/relogio.png"),
-  },
-  {
     id: "services",
     name: "Serviços",
     tags: ["geral"],
     screen: "Services",
     count: 16,
-    image: require("../assets/icons/relogio.png"),
+    image: require("../assets/icons/services.png"),
+  },
+  {
+    id: "endereco",
+    name: "Endereço",
+    tags: ["geral"],
+    screen: "Endereco",
+    count: 16,
+    image: require("../assets/icons/endereco.png"),
   },
 ];
 

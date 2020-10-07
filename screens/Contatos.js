@@ -63,7 +63,7 @@ class Contatos extends Component {
 
       this.getContatos();
     } catch (err) {
-      Alert.alert("ERRO", err);
+      Alert.alert("ERRO", JSON.stringify(err.data));
       console.log(err);
       this.setState({ loading: false });
     }
@@ -141,11 +141,17 @@ class Contatos extends Component {
       >
         <Block>
           <Block flex={false} row center space="between" style={styles.header}>
-            <Text h1 bold>
-              Novo Contato
-            </Text>
+            {contatoNovo && (
+              <Text h1 bold>
+                Novo Contato
+              </Text>
+            )}
+            {!contatoNovo && (
+              <Text h1 bold>
+                Dados de Contato
+              </Text>
+            )}
           </Block>
-
           <ScrollView showsVerticalScrollIndicator={false}>
             <Block style={styles.inputs}>
               <Input
@@ -265,7 +271,13 @@ class Contatos extends Component {
                   onPress={() => this.setModal(contato)}
                   key={contato.id}
                 >
-                  <Card center middle shadow style={styles.contato}>
+                  <Card
+                    color="#fffcfc"
+                    center
+                    middle
+                    shadow
+                    style={styles.contato}
+                  >
                     <Text center medium height={20}>
                       {contato.ddd} - {contato.numero}
                     </Text>

@@ -174,7 +174,7 @@ class Endereco extends Component {
                 label="Número"
                 number
                 style={[styles.input]}
-                defaultValue={String(endereco.numero)}
+                defaultValue={String(endereco.numero ? endereco.numero : "")}
                 onChangeText={(text) =>
                   this.setState((prev) => ({
                     endereco: {

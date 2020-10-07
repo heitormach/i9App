@@ -80,12 +80,14 @@ class Servicos extends Component {
                 key={servico.name}
                 onPress={() => navigation.navigate(servico.screen, { servico })}
               >
-                <Card center middle shadow style={styles.servico}>
-                  <Badge
-                    margin={[0, 0, 15]}
-                    size={40}
-                    color="rgba(37, 130, 91, 0.2)"
-                  >
+                <Card
+                  color="#fffcfc"
+                  center
+                  middle
+                  shadow
+                  style={styles.servico}
+                >
+                  <Badge margin={[0, 0, 15]} size={40}>
                     <Image source={servico.image} />
                   </Badge>
                   <Text center medium height={20}>

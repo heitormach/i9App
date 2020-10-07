@@ -75,16 +75,17 @@ class Faturamento extends Component {
             {faturamentos.map((faturamento) => (
               <TouchableOpacity
                 key={faturamento.name}
-                onPress={() => navigation.navigate(faturamento.screen, { faturamento })}
+                onPress={() =>
+                  navigation.navigate(faturamento.screen, { faturamento })
+                }
               >
-                <Card center middle shadow style={styles.faturamento}>
-                  <Badge
-                    margin={[0, 0, 15]}
-                    size={40}
-                    color="rgba(37, 130, 91, 0.2)"
-                  >
-                    <Image source={faturamento.image} />
-                  </Badge>
+                <Card
+                  color="#fffcfc"
+                  center
+                  middle
+                  shadow
+                  style={styles.faturamento}
+                >
                   <Text center medium height={20}>
                     {faturamento.name}
                   </Text>

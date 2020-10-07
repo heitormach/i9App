@@ -7,11 +7,14 @@ import {
   Image,
   SafeAreaView,
   Modal,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 
-import { Card, Badge, Button, Block, Text, Switch } from "../components";
+import { Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
 const { width } = Dimensions.get("window");
+import apiAgendamento from "../services/apiAgendamento";
 
 class ServicosDia extends Component {
   state = {
@@ -20,47 +23,206 @@ class ServicosDia extends Component {
     showModal: false,
     horaSelected: {},
     showTimePicker: false,
-    servicoSelected: {},
+    servicoSelected: {
+      servico: {},
+      cliente: {
+        endereco: {},
+      },
+    },
+    loading: false,
   };
 
   componentDidMount() {
     this.setState({ servsDia: this.props.navigation.state.params.servsDia });
+    console.log(this.state.servsDia);
   }
+
+  getById = async () => {
+    const { servicoSelected, servsDia } = this.state;
+
+    try {
+      const response = await apiAgendamento.get(
+        `agendamento/${servicoSelected.id}`
+      );
+
+      let foundIndex = servsDia.agendamentos.findIndex(
+        (x) => x.id == response.data.id
+      );
+
+      servsDia.agendamentos[foundIndex] = response.data;
+
+      this.setState({
+        servicoSelected: response.data,
+      });
+    } catch (err) {
+      Alert.alert("Erro", JSON.stringify(err.data));
+      console.log(err);
+    }
+  };
+
+  alertConfirma() {
+    Alert.alert(
+      "Confirmar agendamento",
+      "Deseja confirmar o agendamento do serviço?",
+      [
+        {
+          text: "Não",
+          onPress: console.log("Não"),
+          style: "cancel",
+        },
+        { text: "Confirmar", onPress: () => this.confirmarAgendamento() },
+      ]
+    );
+  }
+
+  confirmarAgendamento = async () => {
+    const { servicoSelected } = this.state;
+    try {
+      this.setState({
+        loading: true,
+      });
+      const response = await apiAgendamento.post("/agendamento/confirmar", {
+        id_agendamento: servicoSelected.id,
+      });
+      this.setState((prev) => ({
+        servicoSelected: { ...prev.servicoSelected, status: "CONFIRMADO" },
+      }));
+      this.setState({ loading: false });
+      Alert.alert("Confirmado!", "O agendamento foi confirmado com sucesso.");
+      this.getById();
+    } catch (err) {
+      Alert.alert("Erro", JSON.stringify(err.data));
+      console.log(err);
+      this.setState({ loading: false });
+    }
+  };
+
+  alertCancela() {
+    Alert.alert(
+      "Cancelar agendamento",
+      "Deseja cancelar o agendamento do serviço?",
+      [
+        {
+          text: "Não",
+          onPress: console.log("Não"),
+          style: "cancel",
+        },
+        { text: "Cancelar", onPress: () => this.cancelarAgendamento() },
+      ]
+    );
+  }
+
+  cancelarAgendamento = async () => {
+    const { servicoSelected } = this.state;
+
+    try {
+      this.setState({
+        loading: true,
+      });
+      const response = await apiAgendamento.post("/agendamento/cancelar", {
+        id_agendamento: servicoSelected.id,
+      });
+      this.setState((prev) => ({
+        servicoSelected: { ...prev.servicoSelected, status: "CANCELADO" },
+      }));
+      Alert.alert("Cancelado!", "O agendamento foi cancelado com sucesso.");
+      this.setState({
+        loading: false,
+      });
+      this.getById();
+    } catch (err) {
+      Alert.alert("Erro", JSON.stringify(err.data));
+      console.log(err);
+      this.setState({
+        loading: false,
+      });
+    }
+  };
+
+  alertConcluido() {
+    Alert.alert(
+      "Concluir agendamento",
+      "Confirmar significa que o serviço já foi prestado e será faturado.\n\n Deseja concluir?",
+      [
+        {
+          text: "Não",
+          onPress: console.log("Não"),
+          style: "cancel",
+        },
+        { text: "Concluir", onPress: () => this.concluirAgendamento() },
+      ]
+    );
+  }
+
+  concluirAgendamento = async () => {
+    const { servicoSelected } = this.state;
+
+    try {
+      this.setState({
+        loading: true,
+      });
+      const response = await apiAgendamento.post("/agendamento/concluir", {
+        id_agendamento: servicoSelected.id,
+      });
+      this.setState((prev) => ({
+        servicoSelected: { ...prev.servicoSelected, status: "CONCLUIDO" },
+      }));
+      Alert.alert("Concluído!", "O agendamento foi concluído com sucesso.");
+      this.setState({
+        loading: false,
+      });
+      this.getById();
+    } catch (err) {
+      Alert.alert("Erro", JSON.stringify(err.data));
+      console.log(err);
+      this.setState({
+        loading: false,
+      });
+    }
+  };
 
   renderServices(serv) {
     return (
-      <Block row card shadow color="white" style={styles.serv}>
+      <Block row card shadow color="#fffcfc" style={styles.serv}>
         <Block
           flex={0.25}
           card
           column
-          color="secondary"
+          color={serv.status === "CANCELADO" ? "orange" : "secondary"}
           style={styles.servStatus}
         >
-          <Block flex={0.25} middle center color={theme.colors.primary}>
+          <Block
+            flex={0.25}
+            middle
+            center
+            color={
+              serv.status === "CANCELADO"
+                ? theme.colors.accent
+                : theme.colors.primary
+            }
+          >
             <Text h4 white style={{ textTransform: "uppercase" }}>
               Horário
             </Text>
           </Block>
           <Block flex={0.7} center middle>
             <Text h2 white>
-              {serv.hora}
+              {serv.data_hora.substring(11, 16)}
             </Text>
-            <Text h4 white>
-              {serv.concluido && "Atendido"}
-              {!serv.concluido && "Em Aberto"}
+            <Text size={13} white>
+              {serv.status}
             </Text>
           </Block>
         </Block>
         <Block flex={0.75} column middle>
           <Text h3 style={{ paddingVertical: 8 }}>
-            Cliente: {serv.cliente}
+            Cliente: {serv.cliente.nome}
           </Text>
           <Text h3 style={{ paddingVertical: 8 }}>
-            Serviço: {serv.nome}
+            Serviço: {serv.servico.nome}
           </Text>
           <Text h3 style={{ paddingVertical: 8 }}>
-            Valor: R$ {serv.preco}.00
+            Valor: R$ {Number(serv.servico.preco).toFixed(2)}
           </Text>
         </Block>
       </Block>
@@ -68,7 +230,11 @@ class ServicosDia extends Component {
   }
 
   renderModal() {
-    const { servicoSelected, servsDia } = this.state;
+    const { servicoSelected, servsDia, loading } = this.state;
+    const dataCorrect = new Date(servsDia.data_agendamento.substring(0, 10));
+    const horaCorrect = servicoSelected.data_hora
+      ? servicoSelected.data_hora.substring(11, 16)
+      : "00:00";
     return (
       <Modal
         animationType="slide"
@@ -80,47 +246,62 @@ class ServicosDia extends Component {
           space="between"
         >
           <Text h1 light>
-            {servicoSelected.nome} - {servsDia.dia}/{servsDia.mes}
+            {servicoSelected.servico.nome} - {dataCorrect.getDate()}/
+            {dataCorrect.getMonth() + 1}
           </Text>
           <ScrollView style={{ marginVertical: theme.sizes.padding }}>
             <Text h2 light style={{ marginBottom: theme.sizes.base }}>
-              Cliente: {servicoSelected.cliente}
+              Cliente: {servicoSelected.cliente.nome}
             </Text>
             <Text h2>Descrição do Serviço:</Text>
             <Text h3 light style={{ marginBottom: theme.sizes.base }}>
-              {servicoSelected.descricao}
+              {servicoSelected.servico.descricao}
             </Text>
             <Text h2 style={{ marginBottom: theme.sizes.base }}>
-              Horário: {servicoSelected.hora}
+              Horário: {horaCorrect}
             </Text>
-            <Text h2>
-              Status: {servicoSelected.concluido && "Atendido"}{" "}
-              {!servicoSelected.concluido && "Em aberto"}
-            </Text>
+            <Text h2>Status: {servicoSelected.status}</Text>
           </ScrollView>
           <Block middle padding={[theme.sizes.base / 2, 0]}>
+            {servicoSelected.status === "PENDENTE" && (
+              <Button gradient onPress={() => this.alertConfirma()}>
+                {loading ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text bold white center>
+                    Confirmar
+                  </Text>
+                )}
+              </Button>
+            )}
+            {servicoSelected.status === "CONFIRMADO" && (
+              <Button gradient onPress={() => this.alertConcluido()}>
+                {loading ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text bold white center>
+                    Concluído
+                  </Text>
+                )}
+              </Button>
+            )}
+            {servicoSelected.status !== "CANCELADO" && (
+              <Button color="accent" onPress={() => this.alertCancela()}>
+                {loading ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text bold white center>
+                    Cancelar
+                  </Text>
+                )}
+              </Button>
+            )}
             <Button
-              gradient
+              color="orange"
               onPress={() => this.setState({ showModal: false })}
             >
               <Text center white>
-                Concluído
-              </Text>
-            </Button>
-            <Button
-              color="accent"
-              onPress={() => this.setState({ showModal: false })}
-            >
-              <Text center white>
-                Cancelar Serviço
-              </Text>
-            </Button>
-            <Button
-              color="primary"
-              onPress={() => this.setState({ showModal: false })}
-            >
-              <Text center white>
-                Fechar
+                Voltar
               </Text>
             </Button>
           </Block>
@@ -134,7 +315,7 @@ class ServicosDia extends Component {
     return (
       <Block flex={0.8} column style={styles.servs}>
         <SafeAreaView style={styles.safe}>
-          {servsDia.servicos.map((serv) => (
+          {servsDia.agendamentos.map((serv) => (
             <TouchableOpacity
               activeOpacity={0.8}
               key={`serv-${serv.id}`}
@@ -153,6 +334,7 @@ class ServicosDia extends Component {
   render() {
     const { profile, navigation } = this.props;
     const { servsDia } = this.state;
+    const dataCorrect = new Date(servsDia.data_agendamento.substring(0, 10));
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -165,7 +347,7 @@ class ServicosDia extends Component {
         </Block>
         <Block flex={false} row space="between" style={styles.servHeader}>
           <Text h1 light>
-            Agenda - {servsDia.dia}/{servsDia.mes}
+            Agenda - {dataCorrect.getDate()}/{dataCorrect.getMonth() + 1}
           </Text>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>

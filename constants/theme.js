@@ -8,6 +8,7 @@ const colors = {
   gray: "#9DA3B4",
   gray2: "#C5CCD6",
   orange: "#ED6004",
+  kekel: "#47b9bf",
 };
 
 const sizes = {
@@ -24,31 +25,31 @@ const sizes = {
   title: 18,
   header: 16,
   body: 14,
-  caption: 12
+  caption: 12,
 };
 
 const fonts = {
   h1: {
-    fontSize: sizes.h1
+    fontSize: sizes.h1,
   },
   h2: {
-    fontSize: sizes.h2
+    fontSize: sizes.h2,
   },
   h3: {
-    fontSize: sizes.h3
+    fontSize: sizes.h3,
   },
   header: {
-    fontSize: sizes.header
+    fontSize: sizes.header,
   },
   title: {
-    fontSize: sizes.title
+    fontSize: sizes.title,
   },
   body: {
-    fontSize: sizes.body
+    fontSize: sizes.body,
   },
   caption: {
-    fontSize: sizes.caption
-  }
+    fontSize: sizes.caption,
+  },
 };
 
 export { colors, sizes, fonts };

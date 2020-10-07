@@ -2,7 +2,7 @@ import { AsyncStorage } from "react-native";
 import { create } from "apisauce";
 
 const apiNegocio = create({
-  baseURL: "http://192.168.0.11:8084",
+  baseURL: "https://i9mentor-agendamento-service.herokuapp.com",
 });
 
 apiNegocio.addAsyncRequestTransform((request) => async () => {

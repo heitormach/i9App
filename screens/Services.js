@@ -5,95 +5,242 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  KeyboardAvoidingView,
   Modal,
-  View,
-  TextInput,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
-
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 import { Card, Button, Block, Text, Input } from "../components";
 import { theme, mocks } from "../constants";
-import { services } from "../constants/mocks";
 const { width } = Dimensions.get("window");
+import apiNegocio from "../services/apiNegocio";
+import { AsyncStorage } from "react-native";
 
 class Services extends Component {
   state = {
     servicos: [],
     showService: false,
-    serviceSelected: {},
+    serviceSelected: {
+      servico: {},
+    },
+    servicoNovo: false,
+    usuario: {},
+    loading: false,
   };
 
   componentDidMount() {
-    this.setState({ services: this.props.services });
+    // this.setState({ services: this.props.services });
+    this.getServicos();
   }
 
-  selectService(service) {
-    this.setState({ serviceSelected: service, showService: true });
-    console.log(service);
+  getServicos = async () => {
+    const usuario = JSON.parse(await AsyncStorage.getItem("@i9App:userDados"));
+    this.setState({ usuario: usuario });
+    try {
+      const response = await apiNegocio.get("estabelecimento/servico");
+      this.setState({ servicos: response.data });
+    } catch (err) {
+      console.log(err);
+      Alert.alert("Erro", JSON.stringify(err.data));
+    }
+  };
+
+  saveServico = async () => {
+    const { serviceSelected } = this.state;
+    try {
+      this.setState({ loading: true });
+      const response = await apiNegocio.patch(
+        "estabelecimento/servico",
+        serviceSelected
+      );
+      this.setState({ loading: false, showService: false });
+      Alert.alert("Salvo!", "Dados salvos com sucesso.");
+      this.getServicos();
+    } catch (err) {
+      this.setState({ loading: false });
+      Alert.alert("Erro", JSON.stringify(err.data));
+      console.log(err);
+    }
+  };
+
+  deleteAlert() {
+    const { serviceSelected } = this.state;
+    Alert.alert(
+      "Excluir contato",
+      `Deseja realmente excluir o serviço ${serviceSelected.servico.nome}?`,
+      [
+        {
+          text: "Não",
+          onPress: () => console.log("Não excluir"),
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          onPress: () => this.deleteServico(),
+        },
+      ]
+    );
   }
+
+  deleteServico = async () => {
+    const { serviceSelected } = this.state;
+
+    try {
+      this.setState({ loading: true });
+
+      const response = await apiNegocio.delete(
+        "/estabelecimento/servico/" + serviceSelected.id
+      );
+
+      Alert.alert("Excluído", "Serviço excluído com sucesso!");
+
+      this.setState({ loading: false, showService: false });
+
+      this.getServicos();
+    } catch (err) {
+      Alert.alert("ERRO", JSON.stringify(err.data));
+      console.log(err);
+      this.setState({ loading: false });
+    }
+  };
+
+  setModal = (servicoSelecionado) => {
+    const { usuario, serviceSelected } = this.state;
+    if (JSON.stringify(servicoSelecionado) === "{}") {
+      this.setState({ servicoNovo: true });
+      this.setState({
+        serviceSelected: {
+          cpfProprietario: usuario.cpf,
+          id: null,
+          servico: {
+            descricao: null,
+            nome: null,
+            preco: 0,
+          },
+        },
+      });
+
+      console.log();
+    } else {
+      this.setState({
+        servicoNovo: false,
+        serviceSelected: servicoSelecionado,
+      });
+    }
+    this.setState({ showService: true });
+  };
 
   renderSelectedService() {
+    const { serviceSelected, loading, servicoNovo } = this.state;
     return (
       <Modal
         animationType="slide"
         visible={this.state.showService}
         onRequestClose={() => this.setState({ showService: false })}
       >
-        <KeyboardAvoidingView style={styles.keyavoid}>
-          <Block
-            padding={[theme.sizes.padding * 2, theme.sizes.padding]}
-            space="between"
-          >
-            <Text h2 light>
-              {this.state.serviceSelected.nome}
-            </Text>
-            <Block>
-              <ScrollView style={{ marginVertical: theme.sizes.padding }}>
-                <Block middle style={styles.inputs}>
-                  <Input
-                    multiline={true}
-                    numberOfLines={10}
-                    label="Descrição"
-                    style={[styles.input]}
-                    defaultValue={this.state.serviceSelected.descricao}
-                    onChangeText={(text) => {
-                      this.state.serviceSelected.descricao = text;
-                    }}
-                  />
-                  <Input
-                    number
-                    label="Preço (R$)"
-                    style={[styles.input]}
-                    defaultValue={String(this.state.serviceSelected.preco)}
-                    onChangeText={(text) => {
-                      this.state.serviceSelected.preco = Number(text);
-                    }}
-                  />
-                </Block>
-              </ScrollView>
-            </Block>
-            <Block middle padding={[theme.sizes.base / 2, 0]}>
-              <Button
-                gradient
-                onPress={() => this.setState({ showService: false })}
-              >
-                <Text center white>
-                  Salvar
-                </Text>
-              </Button>
-              <Button
-                color="accent"
-                onPress={() => this.setState({ showService: false })}
-              >
-                <Text center white>
-                  Excluir
-                </Text>
-              </Button>
-            </Block>
+        <Block>
+          <Block flex={false} row center space="between" style={styles.header}>
+            {servicoNovo && (
+              <Text h1 bold>
+                Novo Serviço
+              </Text>
+            )}
+            {!servicoNovo && (
+              <Text h1 bold>
+                Dados do Serviço
+              </Text>
+            )}
           </Block>
-        </KeyboardAvoidingView>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Block style={styles.inputs}>
+              <Input
+                label="Nome"
+                style={[styles.input]}
+                defaultValue={serviceSelected.servico.nome}
+                onChangeText={(text) =>
+                  this.setState((prev) => ({
+                    serviceSelected: {
+                      ...prev.serviceSelected,
+                      servico: {
+                        ...prev.serviceSelected.servico,
+                        nome: text,
+                      },
+                    },
+                  }))
+                }
+              />
+              <Input
+                multiline={true}
+                numberOfLines={10}
+                label="Descrição"
+                style={[styles.input]}
+                defaultValue={serviceSelected.servico.descricao}
+                onChangeText={(text) =>
+                  this.setState((prev) => ({
+                    serviceSelected: {
+                      ...prev.serviceSelected,
+                      servico: {
+                        ...prev.serviceSelected.servico,
+                        descricao: text,
+                      },
+                    },
+                  }))
+                }
+              />
+              <Input
+                number
+                label="Preço (R$)"
+                style={[styles.input]}
+                defaultValue={String(
+                  serviceSelected.servico.preco
+                    ? Number(serviceSelected.servico.preco).toFixed(2)
+                    : "0.00"
+                )}
+                onChangeText={(text) =>
+                  this.setState((prev) => ({
+                    serviceSelected: {
+                      ...prev.serviceSelected,
+                      servico: {
+                        ...prev.serviceSelected.servico,
+                        preco: text,
+                      },
+                    },
+                  }))
+                }
+              />
+              <Block middle padding={[theme.sizes.base / 2, 0]}>
+                <Button gradient onPress={() => this.saveServico()}>
+                  {loading ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text bold white center>
+                      Salvar
+                    </Text>
+                  )}
+                </Button>
+                {!servicoNovo && (
+                  <Button color="accent" onPress={() => this.deleteAlert()}>
+                    {loading ? (
+                      <ActivityIndicator size="small" color="white" />
+                    ) : (
+                      <Text bold white center>
+                        Excluir
+                      </Text>
+                    )}
+                  </Button>
+                )}
+                <Button
+                  color="orange"
+                  onPress={() => this.setState({ showService: false })}
+                >
+                  <Text center white>
+                    Voltar
+                  </Text>
+                </Button>
+              </Block>
+            </Block>
+          </ScrollView>
+        </Block>
       </Modal>
     );
   }
@@ -111,43 +258,51 @@ class Services extends Component {
             <Image source={profile.avatar} style={styles.avatar} />
           </Button>
         </Block>
-        <KeyboardAvoidingView>
-          <View style={styles.Form}>
-            <TextInput
-              style={styles.Input}
-              placeholderTextColor="#999"
-              autoCorrect={true}
-              placeholder="Pesquisar"
-              maxLength={25}
-            />
-            <TouchableOpacity style={styles.Button}>
-              <Ionicons name="ios-add" size={20} color="white" />
-            </TouchableOpacity>
-          </View>
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            style={{ paddingVertical: theme.sizes.base * 2 }}
-          >
+        <ScrollView
+          showsHorizontalScrollIndicator={false}
+          style={{ paddingVertical: theme.sizes.base * 2 }}
+        >
+          {servicos.length > 0 && (
             <Block flex={false} row space="between" style={styles.servicos}>
-              {services.map((service) => (
+              {servicos.map((service) => (
                 <TouchableOpacity
-                  onPress={() => this.selectService(service)}
-                  key={service.nome}
+                  onPress={() => this.setModal(service)}
+                  key={service.servico.nome}
                 >
-                  <Card center middle shadow style={styles.servico}>
-                    <Text medium height={20}>
-                      {service.nome}
+                  <Card
+                    color="#fffcfc"
+                    center
+                    middle
+                    shadow
+                    style={styles.servico}
+                  >
+                    <Text center medium height={20}>
+                      {service.servico.nome}
                     </Text>
                     <Text medium height={20}>
-                      R$ {Number(service.preco)}
+                      R$ {Number(service.servico.preco).toFixed(2)}
                     </Text>
                   </Card>
                 </TouchableOpacity>
               ))}
             </Block>
-          </ScrollView>
-          {this.renderSelectedService()}
-        </KeyboardAvoidingView>
+          )}
+          {servicos.length === 0 && (
+            <Block>
+              <Text style={{ marginBottom: 50 }} center medium height={20}>
+                Aqui você pode cadastrar os serviços que são prestados no seu
+                negócio.
+              </Text>
+              <Text center medium height={20}>
+                Clique no + para criar um novo.
+              </Text>
+            </Block>
+          )}
+        </ScrollView>
+        <TouchableOpacity onPress={() => this.setModal({})} style={styles.fab}>
+          <Text style={styles.fabIcon}>+</Text>
+        </TouchableOpacity>
+        {this.renderSelectedService()}
       </Block>
     );
   }
@@ -155,7 +310,6 @@ class Services extends Component {
 
 Services.defaultProps = {
   profile: mocks.profile,
-  services: mocks.services,
 };
 
 export default Services;
@@ -189,43 +343,30 @@ const styles = StyleSheet.create({
     maxWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
     maxHeight: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
   },
+  inputs: {
+    marginTop: theme.sizes.base * 0.7,
+    paddingHorizontal: theme.sizes.base * 2,
+  },
   input: {
     borderRadius: 0,
     borderWidth: 0,
     borderBottomColor: theme.colors.gray2,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  inputs: {
-    marginTop: theme.sizes.base * 0.7,
-    paddingHorizontal: theme.sizes.base * 2,
-  },
-  Form: {
-    padding: theme.sizes.base * 2,
-    height: 60,
-    justifyContent: "center",
-    alignSelf: "stretch",
-    flexDirection: "row",
-    paddingTop: 13,
-    borderTopWidth: 1,
-    borderColor: "#eee",
-  },
-  Input: {
-    flex: 1,
-    height: 40,
-    backgroundColor: "#eee",
-    borderRadius: 4,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-  Button: {
-    height: 40,
-    width: 40,
-    justifyContent: "center",
+  fab: {
+    position: "absolute",
+    width: 56,
+    height: 56,
     alignItems: "center",
-    backgroundColor: "#1c6cce",
-    borderRadius: 4,
-    marginLeft: 10,
+    justifyContent: "center",
+    right: 20,
+    bottom: 20,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 30,
+    elevation: 8,
+  },
+  fabIcon: {
+    fontSize: 40,
+    color: "white",
   },
 });

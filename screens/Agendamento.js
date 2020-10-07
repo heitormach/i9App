@@ -7,27 +7,35 @@ import {
   Modal,
   Image,
   SafeAreaView,
-  KeyboardAvoidingView,
-  TextInput,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 
-import { Button, Block, Text, Switch, Divider, Input } from "../components";
+import { Button, Block, Text, Input } from "../components";
 import { theme, mocks } from "../constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-community/picker";
 import moment from "moment";
 const { width } = Dimensions.get("window");
+import apiAgendamento from "../services/apiAgendamento";
+import apiNegocio from "../services/apiNegocio";
+import { AsyncStorage } from "react-native";
+import apiEndereco from "../services/apiEndereco";
 
 class Agendamento extends Component {
   state = {
     agendamentos: [],
-    isDateTimePickerVisible: false,
-    agenduramentoSelected: {},
-    showWeek: false,
-    horaSelected: {},
-    showTimePicker: false,
-    mesIni: moment(new Date()).format("YYYY-MM-DD"),
-    mesFim: moment(new Date()).format("YYYY-MM-DD"),
+    agendamento: {
+      cpf_prop_estab: null,
+      data_hora: new Date(),
+      status: "PENDENTE",
+      cliente: {
+        endereco: {},
+      },
+      servico: {},
+    },
+    agendamentoSelected: {},
+    usuario: {},
     meses: [
       { nome: "Janeiro", numero: 1 },
       { nome: "Fevereiro", numero: 2 },
@@ -42,174 +50,380 @@ class Agendamento extends Component {
       { nome: "Novembro", numero: 11 },
       { nome: "Dezembro", numero: 12 },
     ],
+    listaUF: [
+      "AC",
+      "AL",
+      "AM",
+      "AP",
+      "BA",
+      "CE",
+      "DF",
+      "ES",
+      "GO",
+      "MA",
+      "MG",
+      "MS",
+      "MT",
+      "PA",
+      "PB",
+      "PE",
+      "PI",
+      "PR",
+      "RJ",
+      "RN",
+      "RO",
+      "RR",
+      "RS",
+      "SC",
+      "SE",
+      "SP",
+      "TO",
+    ],
     mesSelected: new Date().getMonth() + 1,
     servicos: [],
-    servicoSelected: "",
+    servicoSelected: {},
     diaSelected: moment(new Date()).format("DD/MM/YYYY"),
+    dataInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    dataFim: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
     dateTime: new Date(),
-    cliente: "",
-    horariosDisponiveis: ["12:00", "13:00", "14:00", "15:00"],
+    cliente: {},
     showNewService: false,
     showDatePicker: false,
+    showTimePicker: false,
+    showEndereco: false,
+    loading: false,
   };
 
   componentDidMount() {
-    this.setState({ agends: this.props.agends });
+    //  this.setState({ agends: this.props.agends });
+    const { dataInicio, dataFim } = this.state;
+    this.getAgendamentos("", dataInicio, dataFim);
+    this.getServicos();
   }
 
-  selectWeekDay(agenduramento) {
-    this.setState({ agenduramentoSelected: agenduramento, showWeek: true });
+  convertData(date) {
+    return moment(date).format("YYYY-MM-DD");
   }
 
-  horaSelected(agenduramento, tipo) {
-    this.setState({
-      horaSelected: { hora: agenduramento, tipo: tipo },
-      showTimePicker: true,
-    });
+  changeServico(servico) {
+    console.log(servico);
+    this.setState((prev) => ({
+      agendamento: {
+        ...prev.agendamento,
+        servico: servico,
+      },
+    }));
   }
 
-  handleTime(event, date, tipo) {
+  getByCep = async (cep) => {
+    const { usuario } = this.state;
+    try {
+      const response = await apiEndereco.get(cep + "/json");
+      this.setState((prev) => ({
+        agendamento: {
+          ...prev.agendamento,
+          cliente: {
+            ...prev.agendamento.cliente,
+            endereco: {
+              ...prev.agendamento.cliente.endereco,
+              cep: cep,
+              logradouro: response.data.logradouro,
+              bairro: response.data.bairro,
+              uf: response.data.uf,
+              cidade: response.data.localidade,
+              cpf_proprietario: usuario.cpf,
+            },
+          },
+        },
+      }));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  getAgendamentos = async (status, dataInicio, dataFim) => {
+    const usuario = JSON.parse(await AsyncStorage.getItem("@i9App:userDados"));
+    this.setState((prev) => ({
+      agendamento: {
+        ...prev.agendamento,
+        cpf_prop_estab: usuario.cpf,
+      },
+    }));
+    this.setState({ usuario: usuario });
+    try {
+      const response = await apiAgendamento.get("agendamento", {
+        cpfPropEstab: usuario.cpf,
+        dataInicio: this.convertData(dataInicio),
+        dataFim: this.convertData(dataFim),
+        status: status,
+      });
+
+      this.setState({ agendamentos: response.data });
+    } catch (err) {
+      console.log(err);
+      Alert.alert("Erro", JSON.stringify(err.data));
+    }
+  };
+
+  getServicos = async () => {
+    const usuario = JSON.parse(await AsyncStorage.getItem("@i9App:userDados"));
+    this.setState({ usuario: usuario });
+
+    try {
+      const response = await apiNegocio.get("estabelecimento/servico", {
+        cpfProprietario: usuario.cpf,
+      });
+
+      this.setState((prev) => ({
+        servicos: response.data,
+        agendamento: {
+          ...prev.agendamento,
+          servico: response.data[0].servico,
+        },
+      }));
+    } catch (err) {
+      console.log(err);
+      Alert.alert("Erro", JSON.stringify(err.data));
+    }
+  };
+
+  saveAgendamento = async () => {
+    const { agendamento } = this.state;
+    console.log(JSON.stringify(agendamento));
+    const dataAgendamento = new Date(agendamento.data_hora);
+    const dataIni = new Date(
+      dataAgendamento.getFullYear(),
+      dataAgendamento.getMonth(),
+      1
+    );
+    const dataFim = new Date(
+      dataAgendamento.getFullYear(),
+      dataAgendamento.getMonth() + 1,
+      0
+    );
+
+    agendamento.data_hora = moment(new Date(agendamento.data_hora)).format(
+      "YYYY-MM-DD HH:mm"
+    );
+
+    try {
+      this.setState({ loading: true });
+      const response = await apiAgendamento.post("agendamento", agendamento);
+      this.setState({
+        loading: false,
+        showNewService: false,
+        mesSelected: dataIni.getMonth() + 1,
+      });
+      Alert.alert("Salvo!", "Dados salvos com sucesso.");
+      this.getAgendamentos("", dataIni, dataFim);
+    } catch (err) {
+      this.setState({ loading: false });
+      Alert.alert("Erro", JSON.stringify(err.data));
+      console.log(err);
+    }
+  };
+
+  horaSelected(data) {
     this.setState({ showTimePicker: false });
-    if (tipo === "ini") {
-      this.state.agenduramentoSelected.horaIni = new Date(date);
-    } else {
-      this.state.agenduramentoSelected.horaFim = new Date(date);
+    const { agendamento } = this.state;
+    const dataAgendamento = new Date(agendamento.data_hora);
+    const dataHora = new Date(data);
+    dataAgendamento.setHours(dataHora.getHours(), dataHora.getMinutes());
+    if (data) {
+      this.setState((prev) => ({
+        agendamento: {
+          ...prev.agendamento,
+          data_hora: dataAgendamento,
+        },
+      }));
     }
   }
 
   onChangeMonth(month) {
     this.setState({ mesSelected: month });
-    
+    const dateParam = new Date();
+    this.getAgendamentos(
+      "",
+      new Date(dateParam.getFullYear(), month - 1, 1),
+      new Date(dateParam.getFullYear(), month, 0)
+    );
   }
 
-  onChange = (event, date) => {
+  onChange = (date) => {
     this.setState({ showDatePicker: false });
+    const { agendamento } = this.state;
+    let dataAgendamento = new Date(agendamento.data_hora);
+    const dataHora = new Date(date);
+
+    dataAgendamento = new Date(
+      dataHora.getFullYear(),
+      dataHora.getMonth(),
+      dataHora.getDate(),
+      dataAgendamento.getHours(),
+      dataAgendamento.getMinutes()
+    );
     if (date) {
-      const currentDate = date;
-      this.setState({
-        diaSelected: moment(new Date(date)).format("DD/MM/YYYY"),
-        dateTime: new Date(date),
-      });
+      this.setState((prev) => ({
+        agendamento: {
+          ...prev.agendamento,
+          data_hora: dataAgendamento,
+        },
+      }));
     }
   };
 
   renderCreateService() {
-    const { services } = mocks;
-    const { horariosDisponiveis } = this.state;
-    console.log(services);
+    const {
+      showNewService,
+      servicos,
+      showDatePicker,
+      agendamento,
+      showTimePicker,
+      showEndereco,
+      loading,
+    } = this.state;
+
     return (
       <Modal
         animationType="slide"
-        visible={this.state.showNewService}
+        visible={showNewService}
         onRequestClose={() => this.setState({ showNewService: false })}
       >
         <Block>
           <Block flex={false} row center space="between" style={styles.header}>
             <Text h1 bold>
-              Novo Agendamento
+              Agendamento
             </Text>
           </Block>
 
           <ScrollView showsVerticalScrollIndicator={false}>
             <Block style={styles.inputs}>
-              <Block
-                row
-                space="between"
-                margin={[10, 0]}
-                style={styles.inputRow}
-              >
+              <Block row space="between" margin={[10, 0]}>
                 <Block>
                   <TouchableOpacity
                     onPress={() => this.setState({ showDatePicker: true })}
                   >
                     <Text gray2>Data</Text>
-                    <TextInput
-                      defaultValue={this.state.diaSelected}
-                      disabled={true}
-                    ></TextInput>
+                    <Text>
+                      {moment(new Date(agendamento.data_hora)).format(
+                        "DD/MM/YYYY"
+                      )}
+                    </Text>
                   </TouchableOpacity>
-                  {this.state.showDatePicker && (
+                  {showDatePicker && (
                     <DateTimePicker
-                      value={this.state.dateTime}
+                      value={agendamento.data_hora}
                       mode="date"
-                      display="calendar"
-                      onChange={(event, date) => this.onChange(event, date)}
+                      display="default"
+                      is24Hour={true}
+                      onChange={(event, date) => this.onChange(date)}
+                    />
+                  )}
+                </Block>
+                <Block>
+                  <TouchableOpacity
+                    onPress={() => this.setState({ showTimePicker: true })}
+                  >
+                    <Text gray2>Hora</Text>
+                    <Text>
+                      {moment(new Date(agendamento.data_hora)).format("HH:mm")}
+                    </Text>
+                  </TouchableOpacity>
+                  {showTimePicker && (
+                    <DateTimePicker
+                      value={agendamento.data_hora}
+                      mode="time"
+                      display="default"
+                      is24Hour={true}
+                      onChange={(event, date) => this.horaSelected(date)}
                     />
                   )}
                 </Block>
               </Block>
-              <Block
-                row
-                space="between"
-                margin={[10, 0]}
-                style={styles.inputRow}
-              >
+              <Block row space="between" margin={[10, 0]}>
                 <Block>
                   <Text gray2>Serviço</Text>
                   <Picker
                     style={{
                       height: 50,
-                      width: 150,
+                      width: 300,
                     }}
-                    selectedValue={this.state.servicoSelected}
-                    onValueChange={(v) => this.setState({ servicoSelected: v })}
+                    selectedValue={agendamento.servico}
+                    onValueChange={(v) => this.changeServico(v)}
                     itemStyle={{ fontSize: 20 }}
                   >
-                    {services.map((servico) => (
+                    {servicos.map((servico) => (
                       <Picker.Item
-                        key={`servico-${servico.nome}`}
-                        label={servico.nome}
-                        value={servico.nome}
-                      />
-                    ))}
-                  </Picker>
-                </Block>
-                <Block>
-                  <Text gray2>Horário</Text>
-                  <Picker
-                    style={{
-                      height: 50,
-                      width: 150,
-                    }}
-                    selectedValue={this.state.horaSelected}
-                    onValueChange={(v) => this.setState({ horaSelected: v })}
-                    itemStyle={{ fontSize: 20 }}
-                  >
-                    {horariosDisponiveis.map((hora) => (
-                      <Picker.Item
-                        key={`servico-${hora}`}
-                        label={hora}
-                        value={hora}
+                        key={`servico-${servico.servico.nome}`}
+                        label={servico.servico.nome}
+                        value={servico.servico}
                       />
                     ))}
                   </Picker>
                 </Block>
               </Block>
-              <Block
-                row
-                space="between"
-                margin={[10, 0]}
-                style={styles.inputRow}
-              >
-                <Block>
-                  <Text gray2>Cliente</Text>
-                  <TextInput
-                    defaultValue={this.state.cliente}
-                    disabled={false}
-                  ></TextInput>
+              <Block>
+                <Block style={styles.inputs}>
+                  <Input
+                    label="Nome do Cliente"
+                    style={[styles.input]}
+                    defaultValue={agendamento.cliente.nome}
+                    onChangeText={(text) =>
+                      this.setState((prev) => ({
+                        agendamento: {
+                          ...prev.agendamento,
+                          cliente: { ...prev.agendamento.cliente, nome: text },
+                        },
+                      }))
+                    }
+                  />
+                  <Input
+                    label="CPF (Opcional)"
+                    style={[styles.input]}
+                    defaultValue={agendamento.cliente.cpf}
+                    onChangeText={(text) =>
+                      this.setState((prev) => ({
+                        agendamento: {
+                          ...prev.agendamento,
+                          cliente: { ...prev.agendamento.cliente, cpf: text },
+                        },
+                      }))
+                    }
+                  />
                 </Block>
               </Block>
+              {showEndereco && (
+                <Block
+                  flex={false}
+                  row
+                  center
+                  space="between"
+                  style={{ paddingHorizontal: theme.sizes.base * 2 }}
+                >
+                  <Text h3>Endereço do Cliente</Text>
+                </Block>
+              )}
+              {showEndereco && this.renderEnderecoCliente()}
               <Block middle padding={[theme.sizes.base / 2, 0]}>
+                <Button gradient onPress={() => this.saveAgendamento()}>
+                  {loading ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text bold white center>
+                      Salvar
+                    </Text>
+                  )}
+                </Button>
                 <Button
-                  gradient
-                  onPress={() => this.setState({ showNewService: false })}
+                  color="secondary"
+                  onPress={() => this.setState({ showEndereco: !showEndereco })}
                 >
                   <Text center white>
-                    Agendar
+                    Endereço do Cliente
                   </Text>
                 </Button>
                 <Button
-                  color="accent"
+                  color="orange"
                   onPress={() => this.setState({ showNewService: false })}
                 >
                   <Text center white>
@@ -224,73 +438,169 @@ class Agendamento extends Component {
     );
   }
 
-  renderSelectedService() {
+  renderEnderecoCliente() {
+    const { agendamento, listaUF } = this.state;
     return (
-      <Modal
-        animationType="slide"
-        visible={this.state.showService}
-        onRequestClose={() => this.setState({ showService: false })}
-      >
-        <KeyboardAvoidingView style={styles.keyavoid}>
-          <Block
-            padding={[theme.sizes.padding * 2, theme.sizes.padding]}
-            space="between"
-          >
-            <Text h2 light>
-              {this.state.serviceSelected.nome}
-            </Text>
-            <Block>
-              <ScrollView style={{ marginVertical: theme.sizes.padding }}>
-                <Block middle style={styles.inputs}>
-                  <Input
-                    multiline={true}
-                    numberOfLines={10}
-                    label="Descrição"
-                    style={[styles.input]}
-                    defaultValue={this.state.serviceSelected.descricao}
-                    onChangeText={(text) => {
-                      this.state.serviceSelected.descricao = text;
-                    }}
-                  />
-                  <Input
-                    number
-                    label="Preço (R$)"
-                    style={[styles.input]}
-                    defaultValue={String(this.state.serviceSelected.preco)}
-                    onChangeText={(text) => {
-                      this.state.serviceSelected.preco = Number(text);
-                    }}
-                  />
-                </Block>
-              </ScrollView>
-            </Block>
-            <Block middle padding={[theme.sizes.base / 2, 0]}>
-              <Button
-                gradient
-                onPress={() => this.setState({ showService: false })}
-              >
-                <Text center white>
-                  Salvar
-                </Text>
-              </Button>
-              <Button
-                color="accent"
-                onPress={() => this.setState({ showService: false })}
-              >
-                <Text center white>
-                  Excluir
-                </Text>
-              </Button>
-            </Block>
+      <Block>
+        <Block style={styles.inputs}>
+          <Input
+            label="CEP"
+            style={[styles.input]}
+            defaultValue={agendamento.cliente.endereco.cep}
+            onBlur={() => this.getByCep(agendamento.cliente.endereco.cep)}
+            onChangeText={(text) =>
+              this.setState((prev) => ({
+                agendamento: {
+                  ...prev.agendamento,
+                  cliente: {
+                    ...prev.agendamento.cliente,
+                    endereco: {
+                      ...prev.agendamento.cliente.endereco,
+                      cep: text,
+                    },
+                  },
+                },
+              }))
+            }
+          />
+          <Input
+            label="Rua"
+            number
+            style={[styles.input]}
+            defaultValue={agendamento.cliente.endereco.logradouro}
+            onChangeText={(text) =>
+              this.setState((prev) => ({
+                agendamento: {
+                  ...prev.agendamento,
+                  cliente: {
+                    ...prev.agendamento.cliente,
+                    endereco: {
+                      ...prev.agendamento.cliente.endereco,
+                      logradouro: text,
+                    },
+                  },
+                },
+              }))
+            }
+          />
+          <Input
+            label="Número"
+            number
+            style={[styles.input]}
+            defaultValue={String(
+              agendamento.cliente.endereco.numero
+                ? agendamento.cliente.endereco.numero
+                : ""
+            )}
+            onChangeText={(text) =>
+              this.setState((prev) => ({
+                agendamento: {
+                  ...prev.agendamento,
+                  cliente: {
+                    ...prev.agendamento.cliente,
+                    endereco: {
+                      ...prev.agendamento.cliente.endereco,
+                      numero: text,
+                    },
+                  },
+                },
+              }))
+            }
+          />
+          <Input
+            label="Bairro"
+            style={[styles.input]}
+            defaultValue={agendamento.cliente.endereco.bairro}
+            onChangeText={(text) =>
+              this.setState((prev) => ({
+                agendamento: {
+                  ...prev.agendamento,
+                  cliente: {
+                    ...prev.agendamento.cliente,
+                    endereco: {
+                      ...prev.agendamento.cliente.endereco,
+                      bairro: text,
+                    },
+                  },
+                },
+              }))
+            }
+          />
+          <Input
+            label="Complemento"
+            style={[styles.input]}
+            defaultValue={agendamento.cliente.endereco.complemento}
+            onChangeText={(text) =>
+              this.setState((prev) => ({
+                agendamento: {
+                  ...prev.agendamento,
+                  cliente: {
+                    ...prev.agendamento.cliente,
+                    endereco: {
+                      ...prev.agendamento.cliente.endereco,
+                      complemento: text,
+                    },
+                  },
+                },
+              }))
+            }
+          />
+          <Block>
+            <Text gray2>Estado</Text>
+            <Picker
+              style={{
+                height: 50,
+                width: 150,
+              }}
+              selectedValue={agendamento.cliente.endereco.uf}
+              onValue={(v) =>
+                this.setState((prev) => ({
+                  agendamento: {
+                    ...prev.agendamento,
+                    cliente: {
+                      ...prev.agendamento.cliente,
+                      endereco: {
+                        ...prev.agendamento.cliente.endereco,
+                        uf: v,
+                      },
+                    },
+                  },
+                }))
+              }
+              itemStyle={{ fontSize: 20 }}
+            >
+              {listaUF.map((uf) => (
+                <Picker.Item key={`${uf}`} label={uf} value={uf} />
+              ))}
+            </Picker>
           </Block>
-        </KeyboardAvoidingView>
-      </Modal>
+          <Input
+            label="Cidade"
+            style={[styles.input]}
+            defaultValue={agendamento.cliente.endereco.cidade}
+            onChangeText={(text) =>
+              this.setState((prev) => ({
+                agendamento: {
+                  ...prev.agendamento,
+                  cliente: {
+                    ...prev.agendamento.cliente,
+                    endereco: {
+                      ...prev.agendamento.cliente.endereco,
+                      cidade: text,
+                    },
+                  },
+                },
+              }))
+            }
+          />
+        </Block>
+      </Block>
     );
   }
 
   renderAgend(agend) {
     return (
-      <Block row card shadow color="white" style={styles.agend}>
+      <Block row card shadow color="#fffcfc" style={styles.agend}>
         <Block
           flex={0.25}
           card
@@ -305,13 +615,13 @@ class Agendamento extends Component {
           </Block>
           <Block flex={0.7} center middle>
             <Text h2 white>
-              {agend.dia}
+              {new Date(agend.data_agendamento.substring(0, 10)).getDate()}
             </Text>
           </Block>
         </Block>
         <Block flex={0.75} column middle>
           <Text h3 style={{ paddingVertical: 8 }}>
-            Serviços: {agend.servicos.length}
+            Serviços: {agend.quantidade_servicos}
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
             (Aperte para visualizar)
@@ -322,7 +632,8 @@ class Agendamento extends Component {
   }
 
   renderAgends() {
-    const { agendamentos, navigation } = this.props;
+    const { navigation } = this.props;
+    const { agendamentos } = this.state;
     return (
       <Block flex={0.8} column style={styles.agends}>
         <SafeAreaView style={styles.safe}>
@@ -332,11 +643,27 @@ class Agendamento extends Component {
                 navigation.navigate("ServicosDia", { servsDia: agend })
               }
               activeOpacity={0.8}
-              key={`agend-${agend.id}`}
+              key={`agend-${agend.data_agendamento}`}
             >
               {this.renderAgend(agend)}
             </TouchableOpacity>
           ))}
+          {agendamentos.length === 0 && (
+            <Block>
+              <Text style={{ marginBottom: 50 }} center medium height={20}>
+                Aqui você pode agendar e gerenciar os agendamentos de serviços
+                feitos por você ou pelos seus clientes.
+              </Text>
+
+              <Text style={{ marginBottom: 50 }} center medium height={20}>
+                Nenhum serviço encontrado no mês
+              </Text>
+
+              <Text center medium height={20}>
+                Clique no + para criar um novo.
+              </Text>
+            </Block>
+          )}
         </SafeAreaView>
       </Block>
     );
@@ -344,7 +671,7 @@ class Agendamento extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { meses } = this.state;
+    const { meses, mesSelected } = this.state;
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -362,8 +689,8 @@ class Agendamento extends Component {
               width: 200,
               transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],
             }}
-            selectedValue={this.state.mesSelected}
-            onValueChange={(v) => this.setState({ mesSelected: v })}
+            selectedValue={mesSelected}
+            onValueChange={(v) => this.onChangeMonth(v)}
             itemStyle={{ fontSize: 20 }}
           >
             {meses.map((mes) => (
@@ -392,8 +719,6 @@ class Agendamento extends Component {
 
 Agendamento.defaultProps = {
   profile: mocks.profile,
-  agendamentos: mocks.agendamentos,
-  servicos: mocks.services,
 };
 
 export default Agendamento;
@@ -460,6 +785,12 @@ const styles = StyleSheet.create({
   fabIcon: {
     fontSize: 40,
     color: "white",
+  },
+  input: {
+    borderRadius: 0,
+    borderWidth: 0,
+    borderBottomColor: theme.colors.gray2,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   inputs: {
     marginTop: theme.sizes.base * 0.7,

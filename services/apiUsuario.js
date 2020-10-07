@@ -2,7 +2,7 @@ import { AsyncStorage } from "react-native";
 import { create } from "apisauce";
 
 const apiUsuario = create({
-  baseURL: "http://192.168.0.11:8081",
+  baseURL: "https://i9mentor-usuario-service.herokuapp.com",
 });
 
 apiUsuario.addAsyncRequestTransform((request) => async () => {

@@ -152,7 +152,9 @@ class Browse extends Component {
                 shadow
                 style={styles.category}
               >
-                <Badge margin={[0, 0, 15]} size={40}></Badge>
+                <Badge margin={[0, 0, 15]} size={40}>
+                  <Image source={require("../assets/icons/logout.png")} />
+                </Badge>
                 <Text medium height={20}>
                   Sair
                 </Text>
