@@ -190,12 +190,8 @@ export default class SignUp extends Component {
               onChangeText={(text) => this.setState({ cpf: text })}
             />
             <TouchableOpacity onPress={() => this.showDatepicker()}>
-              <Input
-                label="Data de Nascimento"
-                style={[styles.input]}
-                value={this.state.data_nascimento}
-                disabled={true}
-              ></Input>
+              <Text gray2>Data de Nascimento</Text>
+              <Text>{this.state.data_nascimento}</Text>
             </TouchableOpacity>
             {this.state.show && (
               <DateTimePicker

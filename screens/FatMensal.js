@@ -4,59 +4,114 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Modal,
   Image,
   SafeAreaView,
-  View,
+  Alert,
 } from "react-native";
 
-import { Button, Block, Text, Switch } from "../components";
+import { Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 const { width } = Dimensions.get("window");
 import { BarChart, Grid, YAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
 import { Picker } from "@react-native-community/picker";
+import { AsyncStorage } from "react-native";
+import apiTransacao from "../services/apiTransacao";
 
 class FatMensal extends Component {
   state = {
-    faturamentos: [],
+    faturamentos: {
+      quantidade_total: 0,
+      servicos: [
+        {
+          percentual_valor_total: 0,
+          quantidade: 0,
+          servico: {
+            descricao: "",
+            nome: "",
+            preco: 0,
+          },
+          valor: 0,
+        },
+      ],
+      valor_total: 0,
+    },
     isDateTimePickerVisible: false,
     faturamentoSelected: {},
     showWeek: false,
     horaSelected: {},
     showTimePicker: false,
+    usuario: {},
     meses: [
-      "Janeiro",
-      "Fevereiro",
-      "Março",
-      "Abril",
-      "Maio",
-      "Junho",
-      "Julho",
-      "Agosto",
-      "Setembro",
-      "Outubro",
-      "Novembro",
-      "Dezembro",
+      { nome: "Janeiro", numero: 1 },
+      { nome: "Fevereiro", numero: 2 },
+      { nome: "Março", numero: 3 },
+      { nome: "Abril", numero: 4 },
+      { nome: "Maio", numero: 5 },
+      { nome: "Junho", numero: 6 },
+      { nome: "Julho", numero: 7 },
+      { nome: "Agosto", numero: 8 },
+      { nome: "Setembro", numero: 9 },
+      { nome: "Outubro", numero: 10 },
+      { nome: "Novembro", numero: 11 },
+      { nome: "Dezembro", numero: 12 },
     ],
-    mesSelected: "Agosto",
+    mesSelected: new Date().getMonth() + 1,
+    dataInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    dataFim: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
   };
 
   componentDidMount() {
-    this.setState({ fats: this.props.fats });
+    // this.setState({ fats: this.props.fats });
+    const { dataInicio, dataFim } = this.state;
+    console.log(dataInicio);
+    this.getTransacao(dataInicio, dataFim);
+  }
+
+  convertData(date) {
+    return moment(date).format("YYYY-MM-DD");
+  }
+
+  getTransacao = async (dataInicio, dataFim) => {
+    const usuario = JSON.parse(await AsyncStorage.getItem("@i9App:userDados"));
+    this.setState({ usuario: usuario });
+    try {
+      const response = await apiTransacao.get("transacao/relatorio", {
+        cpfPropietarioEstabelecimento: usuario.cpf,
+        dataInicio: this.convertData(dataInicio),
+        dataFim: this.convertData(dataFim),
+      });
+
+      this.setState({ faturamentos: response.data });
+      console.log(response);
+    } catch (err) {
+      //console.log(err);
+      Alert.alert("Erro", JSON.stringify(err.data));
+    }
+  };
+
+  onChangeMonth(month) {
+    this.setState({ mesSelected: month });
+    const dateParam = new Date();
+    this.getTransacao(
+      new Date(dateParam.getFullYear(), month - 1, 1),
+      new Date(dateParam.getFullYear(), month, 0)
+    );
   }
 
   selectWeekDay(faturamento) {
     this.setState({ faturamentoSelected: faturamento, showWeek: true });
   }
 
-  horaSelected(faturamento, tipo) {
-    this.setState({
-      horaSelected: { hora: faturamento, tipo: tipo },
-      showTimePicker: true,
-    });
+  componentDidMount() {
+    //  this.setState({ agends: this.props.agends });
+    const { dataInicio, dataFim } = this.state;
+    this.getTransacao(dataInicio, dataFim);
+  }
+
+  convertData(date) {
+    return moment(date).format("YYYY-MM-DD");
   }
 
   handleTime(event, date, tipo) {
@@ -69,7 +124,7 @@ class FatMensal extends Component {
   }
 
   renderChart() {
-    const { fats } = this.props;
+    const { faturamentos } = this.state;
 
     return (
       <Block row card shadow color="white" style={styles.fats}>
@@ -77,18 +132,20 @@ class FatMensal extends Component {
           style={{ flexDirection: "row", height: 150, paddingVertical: 5 }}
         >
           <YAxis
-            data={fats}
+            data={faturamentos.servicos}
             yAccessor={({ index }) => index}
             contentInset={{ top: 10, bottom: 10 }}
             scale={scale.scaleBand}
             spacing={0.2}
-            formatLabel={(_, index) => fats[index].nome}
+            formatLabel={(_, index) =>
+              faturamentos.servicos[index].servico.nome
+            }
           />
           <BarChart
             style={{ flex: 1, marginLeft: 8 }}
-            data={fats}
+            data={faturamentos.servicos}
             horizontal={true}
-            yAccessor={({ item }) => item.qtd * item.total}
+            yAccessor={({ item }) => Number(item.percentual_valor_total)}
             svg={{ fill: theme.colors.primary }}
             contentInset={{ top: 10, bottom: 10 }}
             spacing={0.2}
@@ -101,94 +158,8 @@ class FatMensal extends Component {
     );
   }
 
-  renderSelectTimeWeek() {
-    return (
-      <Modal
-        animationType="slide"
-        visible={this.state.showWeek}
-        onRequestClose={() => this.setState({ showWeek: false })}
-      >
-        <Block
-          padding={[theme.sizes.padding * 2, theme.sizes.padding]}
-          space="between"
-        >
-          <Text h2 light>
-            {this.state.faturamentoSelected.name}
-          </Text>
-          <ScrollView style={{ marginVertical: theme.sizes.padding }}>
-            <TouchableOpacity
-              onPress={() =>
-                this.horaSelected(this.state.faturamentoSelected.horaIni, "ini")
-              }
-            >
-              <Text
-                h2
-                light
-                size={15}
-                style={{ marginBottom: theme.sizes.base }}
-              >
-                Horário de Início:
-                {moment(
-                  new Date(this.state.faturamentoSelected.horaIni)
-                ).format("HH:mm")}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                this.horaSelected(this.state.faturamentoSelected.horaFim, "fim")
-              }
-            >
-              <Text
-                h2
-                light
-                size={15}
-                style={{ marginBottom: theme.sizes.base }}
-              >
-                Horário de Término:
-                {moment(
-                  new Date(this.state.faturamentoSelected.horaFim)
-                ).format("HH:mm")}
-              </Text>
-            </TouchableOpacity>
-            {this.state.showTimePicker && (
-              <DateTimePicker
-                value={new Date(this.state.horaSelected.hora)}
-                mode="time"
-                is24Hour={true}
-                display="default"
-                onChange={(event, date) =>
-                  this.handleTime(event, date, this.state.horaSelected.tipo)
-                }
-              />
-            )}
-            <Block
-              row
-              center
-              space="between"
-              style={{ marginBottom: theme.sizes.base * 2 }}
-            >
-              <Text gray2>Não trabalho</Text>
-              <Switch
-                value={this.state.faturamentoSelected.naoTrab}
-                onValueChange={(value) =>
-                  (this.state.faturamentoSelected.naoTrab = value)
-                }
-              />
-            </Block>
-          </ScrollView>
-          <Block middle padding={[theme.sizes.base / 2, 0]}>
-            <Button gradient onPress={() => this.setState({ showWeek: false })}>
-              <Text center white>
-                Salvar
-              </Text>
-            </Button>
-          </Block>
-        </Block>
-      </Modal>
-    );
-  }
-
   renderTotal() {
+    const { faturamentos } = this.state;
     return (
       <Block row card shadow color="white" style={styles.fat}>
         <Block flex={0.25} card column color="orange" style={styles.fatStatus}>
@@ -199,19 +170,19 @@ class FatMensal extends Component {
           </Block>
           <Block flex={0.7} center middle>
             <Text h4 white>
-              R$ 2.000
+              R$ {Number(faturamentos.valor_total).toFixed(2)}
             </Text>
             <Text h5 white>
-              53 feitos
+              {faturamentos.quantidade_total} feitos
             </Text>
           </Block>
         </Block>
         <Block flex={0.75} column middle>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Você realizou 53 serviços no mês
+            Você realizou {faturamentos.quantidade_total} serviços no mês
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Valor Total Arrecadado: R$ 2.000,00
+            Valor Total Arrecadado: R$ {faturamentos.valor_total}
           </Text>
           <Text caption semibold></Text>
         </Block>
@@ -231,24 +202,24 @@ class FatMensal extends Component {
         >
           <Block flex={0.25} middle center color={theme.colors.primary}>
             <Text size={10} white style={{ textTransform: "uppercase" }}>
-              {fat.nome}
+              {fat.servico.nome}
             </Text>
           </Block>
           <Block flex={0.7} center middle>
             <Text h2 white>
-              R$ {fat.total}
+              R$ {fat.valor}
             </Text>
             <Text h5 white>
-              {fat.qtd} feitos
+              {fat.quantidade} feitos
             </Text>
           </Block>
         </Block>
         <Block flex={0.75} column middle>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Você realizou {fat.qtd} {fat.nome}
+            Você realizou {fat.quantidade} {fat.servico.nome}
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Valor Arrecadado: R$ {fat.total}
+            Valor Arrecadado: R$ {fat.valor}
           </Text>
           <Text caption semibold></Text>
         </Block>
@@ -257,14 +228,17 @@ class FatMensal extends Component {
   }
 
   renderFats() {
-    const { fats } = this.props;
+    const { faturamentos } = this.state;
 
     return (
       <Block flex={0.8} column style={styles.fats}>
         <SafeAreaView style={styles.safe}>
           {this.renderTotal()}
-          {fats.map((fat) => (
-            <TouchableOpacity activeOpacity={0.8} key={`fat-${fat.id}`}>
+          {faturamentos.servicos.map((fat) => (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              key={`fat-${fat.percentual_valor_total}${fat.valor}`}
+            >
               {this.renderFat(fat)}
             </TouchableOpacity>
           ))}
@@ -275,7 +249,7 @@ class FatMensal extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { meses } = this.state;
+    const { meses, mesSelected } = this.state;
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -293,12 +267,16 @@ class FatMensal extends Component {
               width: 200,
               transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],
             }}
-            selectedValue={this.state.mesSelected}
-            onValueChange={(v) => this.setState({ mesSelected: v })}
+            selectedValue={mesSelected}
+            onValueChange={(v) => this.onChangeMonth(v)}
             itemStyle={{ fontSize: 20 }}
           >
             {meses.map((mes) => (
-              <Picker.Item key={`mes-${mes}`} label={mes} value={mes} />
+              <Picker.Item
+                key={`mes-${mes.nome}`}
+                label={mes.nome}
+                value={mes.numero}
+              />
             ))}
           </Picker>
         </Block>

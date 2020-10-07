@@ -17,9 +17,9 @@ const categories = [
   },
   {
     id: "faturas",
-    name: "Faturamento",
+    name: "Financeiro",
     tags: ["menu"],
-    screen: "Faturamento",
+    screen: "Financeiro",
     count: 68,
     image: require("../assets/icons/fatura.png"),
   },
@@ -46,6 +46,33 @@ const categories = [
     screen: "Ajuda",
     count: 47,
     image: require("../assets/icons/ajuda.png"),
+  },
+];
+
+const financeiro = [
+  {
+    id: "faturas",
+    name: "Faturamento",
+    tags: ["menu"],
+    screen: "Faturamento",
+    count: 68,
+    image: require("../assets/icons/fatura.png"),
+  },
+  {
+    id: "servicos",
+    name: "Despesas",
+    tags: ["menu"],
+    screen: "Despesa",
+    count: 16,
+    image: require("../assets/icons/servicos.png"),
+  },
+  {
+    id: "lucro",
+    name: "Lucro",
+    tags: ["menu"],
+    screen: "Lucro",
+    count: 147,
+    image: require("../assets/icons/agendamentos.png"),
   },
 ];
 
@@ -93,10 +120,10 @@ const servicos = [
 ];
 
 const faturamentos = [
-  {
+  /* {
     id: "diario",
     name: "Diário",
-    tags: ["geral"],
+    tags: ["Geral"],
     screen: "FatDiario",
     count: 147,
     image: require("../assets/icons/contatos.png"),
@@ -108,7 +135,7 @@ const faturamentos = [
     screen: "FatSemanal",
     count: 16,
     image: require("../assets/icons/relogio.png"),
-  },
+  }, */
   {
     id: "mensal",
     name: "Mensal",
@@ -480,4 +507,5 @@ export {
   agendamentos,
   planos,
   estudos,
+  financeiro,
 };

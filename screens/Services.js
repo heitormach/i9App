@@ -66,7 +66,7 @@ class Services extends Component {
   deleteAlert() {
     const { serviceSelected } = this.state;
     Alert.alert(
-      "Excluir contato",
+      "Excluir Serviço",
       `Deseja realmente excluir o serviço ${serviceSelected.servico.nome}?`,
       [
         {
@@ -191,11 +191,7 @@ class Services extends Component {
                 number
                 label="Preço (R$)"
                 style={[styles.input]}
-                defaultValue={String(
-                  serviceSelected.servico.preco
-                    ? Number(serviceSelected.servico.preco).toFixed(2)
-                    : "0.00"
-                )}
+                defaultValue={String(serviceSelected.servico.preco)}
                 onChangeText={(text) =>
                   this.setState((prev) => ({
                     serviceSelected: {
