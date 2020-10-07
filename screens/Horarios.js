@@ -39,10 +39,13 @@ class Horarios extends Component {
 
   getHorarios = async () => {
     try {
+      this.setState({ loading: true });
       const response = await apiNegocio.get("estabelecimento/atendimento");
 
       this.setState({ horarios: response.data });
+      this.setState({ loading: false });
     } catch (err) {
+      this.setState({ loading: false });
       console.log(err.data);
     }
   };
@@ -59,7 +62,6 @@ class Horarios extends Component {
       this.setState({ loading: false, showWeek: false });
 
       Alert.alert("Salvo", "Dados atualizados");
-      console.log(response);
       this.getHorarios();
     } catch (err) {
       Alert.alert("Erro", JSON.stringify(err.data));
@@ -201,7 +203,7 @@ class Horarios extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { horarios } = this.state;
+    const { horarios, loading } = this.state;
     let horaRender;
     const aberto = (horario) => {
       if (!horario.aberto) {
@@ -233,22 +235,26 @@ class Horarios extends Component {
             showsHorizontalScrollIndicator={false}
             style={{ paddingVertical: theme.sizes.base * 2 }}
           >
-            <Block flex={false} row space="between" style={styles.horarios}>
-              {horarios.map((horario) => (
-                <TouchableOpacity
-                  onPress={() => this.selectWeekDay(horario)}
-                  key={horario.dia_semana}
-                >
-                  <Card center middle shadow style={styles.horario}>
-                    <Text medium height={20}>
-                      {horario.dia_semana}
-                    </Text>
-                    {aberto(horario)}
-                    {horaRender}
-                  </Card>
-                </TouchableOpacity>
-              ))}
-            </Block>
+            {loading ? (
+              <ActivityIndicator size="large" color="green" />
+            ) : (
+              <Block flex={false} row space="between" style={styles.horarios}>
+                {horarios.map((horario) => (
+                  <TouchableOpacity
+                    onPress={() => this.selectWeekDay(horario)}
+                    key={horario.dia_semana}
+                  >
+                    <Card center middle shadow style={styles.horario}>
+                      <Text medium height={20}>
+                        {horario.dia_semana}
+                      </Text>
+                      {aberto(horario)}
+                      {horaRender}
+                    </Card>
+                  </TouchableOpacity>
+                ))}
+              </Block>
+            )}
           </ScrollView>
           {this.renderSelectTimeWeek()}
         </KeyboardAvoidingView>

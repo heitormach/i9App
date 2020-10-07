@@ -35,13 +35,16 @@ class Contatos extends Component {
 
   getContatos = async () => {
     try {
+      this.setState({ loading: true });
       const response = await apiNegocio.get("/estabelecimento/contato");
 
       this.setState({ contatos: response.data });
       console.log(response.data);
+      this.setState({ loading: false });
     } catch (err) {
       Alert.alert("Erro ao buscar contatos", err.data);
       console.log(err);
+      this.setState({ loading: false });
     }
   };
 
@@ -248,7 +251,7 @@ class Contatos extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { contatos } = this.state;
+    const { contatos, loading } = this.state;
 
     return (
       <Block>
@@ -264,43 +267,47 @@ class Contatos extends Component {
           showsVerticalScrollIndicator={false}
           style={{ paddingVertical: theme.sizes.base * 2 }}
         >
-          <Block flex={false} row space="between" style={styles.contatos}>
-            {contatos.length > 0 &&
-              contatos.map((contato) => (
-                <TouchableOpacity
-                  onPress={() => this.setModal(contato)}
-                  key={contato.id}
-                >
-                  <Card
-                    color="#fffcfc"
-                    center
-                    middle
-                    shadow
-                    style={styles.contato}
+          {loading ? (
+            <ActivityIndicator size="large" color="green" />
+          ) : (
+            <Block flex={false} row space="between" style={styles.contatos}>
+              {contatos.length > 0 &&
+                contatos.map((contato) => (
+                  <TouchableOpacity
+                    onPress={() => this.setModal(contato)}
+                    key={contato.id}
                   >
-                    <Text center medium height={20}>
-                      {contato.ddd} - {contato.numero}
-                    </Text>
-                    {contato.ind_whatsapp && (
-                      <Text center medium color="green">
-                        WhatsApp
+                    <Card
+                      color="#fffcfc"
+                      center
+                      middle
+                      shadow
+                      style={styles.contato}
+                    >
+                      <Text center medium height={20}>
+                        {contato.ddd} - {contato.numero}
                       </Text>
-                    )}
-                  </Card>
-                </TouchableOpacity>
-              ))}
-            {contatos.length === 0 && (
-              <Block>
-                <Text style={{ marginBottom: 50 }} center medium height={20}>
-                  Aqui você pode cadastrar números para os clientes entrarem em
-                  contato com você!
-                </Text>
-                <Text center medium height={20}>
-                  Clique no + para criar um novo.
-                </Text>
-              </Block>
-            )}
-          </Block>
+                      {contato.ind_whatsapp && (
+                        <Text center medium color="green">
+                          WhatsApp
+                        </Text>
+                      )}
+                    </Card>
+                  </TouchableOpacity>
+                ))}
+              {contatos.length === 0 && (
+                <Block>
+                  <Text style={{ marginBottom: 50 }} center medium height={20}>
+                    Aqui você pode cadastrar números para os clientes entrarem
+                    em contato com você!
+                  </Text>
+                  <Text center medium height={20}>
+                    Clique no + para criar um novo.
+                  </Text>
+                </Block>
+              )}
+            </Block>
+          )}
         </ScrollView>
         <TouchableOpacity onPress={() => this.setModal({})} style={styles.fab}>
           <Text style={styles.fabIcon}>+</Text>

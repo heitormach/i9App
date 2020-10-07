@@ -22,6 +22,7 @@ class Endereco extends Component {
     endereco: {},
     usuario: {},
     loading: false,
+    loadingTela: false,
     listaUF: [
       "AC",
       "AL",
@@ -83,11 +84,10 @@ class Endereco extends Component {
     this.setState({ usuario: usuario });
 
     try {
+      this.setState({ loadingTela: true });
       const response = await apiNegocio.get(
         "estabelecimento/local/" + usuario.cpf
       );
-
-      console.log(response.data);
 
       if (response.data) {
         this.setState({ endereco: response.data });
@@ -98,6 +98,7 @@ class Endereco extends Component {
           },
         });
       }
+      this.setState({ loadingTela: false });
     } catch (err) {
       console.log(err);
       Alert.alert("Erro", JSON.stringify(err.data));
@@ -106,6 +107,7 @@ class Endereco extends Component {
           cpf_proprietario: usuario.cpf,
         },
       });
+      this.setState({ loadingTela: false });
     }
   };
 
@@ -128,7 +130,7 @@ class Endereco extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { endereco, loading, listaUF } = this.state;
+    const { endereco, loading, loadingTela, listaUF } = this.state;
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -140,120 +142,124 @@ class Endereco extends Component {
           </Button>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
-          <KeyboardAvoidingView>
-            <Block style={styles.inputs}>
-              <Input
-                label="CEP"
-                style={[styles.input]}
-                defaultValue={endereco.cep}
-                onBlur={() => this.getByCep(endereco.cep)}
-                onChangeText={(text) =>
-                  this.setState((prev) => ({
-                    endereco: {
-                      ...prev.endereco,
-                      cep: text,
-                    },
-                  }))
-                }
-              />
-              <Input
-                label="Rua"
-                number
-                style={[styles.input]}
-                defaultValue={endereco.logradouro}
-                onChangeText={(text) =>
-                  this.setState((prev) => ({
-                    endereco: {
-                      ...prev.endereco,
-                      logradouro: text,
-                    },
-                  }))
-                }
-              />
-              <Input
-                label="Número"
-                number
-                style={[styles.input]}
-                defaultValue={String(endereco.numero ? endereco.numero : "")}
-                onChangeText={(text) =>
-                  this.setState((prev) => ({
-                    endereco: {
-                      ...prev.endereco,
-                      numero: text,
-                    },
-                  }))
-                }
-              />
-              <Input
-                label="Bairro"
-                style={[styles.input]}
-                defaultValue={endereco.bairro}
-                onChangeText={(text) =>
-                  this.setState((prev) => ({
-                    endereco: {
-                      ...prev.endereco,
-                      bairro: text,
-                    },
-                  }))
-                }
-              />
-              <Input
-                label="Complemento"
-                style={[styles.input]}
-                defaultValue={endereco.complemento}
-                onChangeText={(text) =>
-                  this.setState((prev) => ({
-                    endereco: {
-                      ...prev.endereco,
-                      complemento: text,
-                    },
-                  }))
-                }
-              />
-              <Block>
-                <Text gray2>Estado</Text>
-                <Picker
-                  style={{
-                    height: 50,
-                    width: 150,
-                  }}
-                  selectedValue={endereco.uf}
-                  onValueChange={(v) =>
+          {loadingTela ? (
+            <ActivityIndicator size="large" color="green" />
+          ) : (
+            <KeyboardAvoidingView>
+              <Block style={styles.inputs}>
+                <Input
+                  label="CEP"
+                  style={[styles.input]}
+                  defaultValue={endereco.cep}
+                  onBlur={() => this.getByCep(endereco.cep)}
+                  onChangeText={(text) =>
                     this.setState((prev) => ({
-                      endereco: { ...prev.endereco, uf: v },
+                      endereco: {
+                        ...prev.endereco,
+                        cep: text,
+                      },
                     }))
                   }
-                  itemStyle={{ fontSize: 20 }}
-                >
-                  {listaUF.map((uf) => (
-                    <Picker.Item key={`${uf}`} label={uf} value={uf} />
-                  ))}
-                </Picker>
+                />
+                <Input
+                  label="Rua"
+                  number
+                  style={[styles.input]}
+                  defaultValue={endereco.logradouro}
+                  onChangeText={(text) =>
+                    this.setState((prev) => ({
+                      endereco: {
+                        ...prev.endereco,
+                        logradouro: text,
+                      },
+                    }))
+                  }
+                />
+                <Input
+                  label="Número"
+                  number
+                  style={[styles.input]}
+                  defaultValue={String(endereco.numero ? endereco.numero : "")}
+                  onChangeText={(text) =>
+                    this.setState((prev) => ({
+                      endereco: {
+                        ...prev.endereco,
+                        numero: text,
+                      },
+                    }))
+                  }
+                />
+                <Input
+                  label="Bairro"
+                  style={[styles.input]}
+                  defaultValue={endereco.bairro}
+                  onChangeText={(text) =>
+                    this.setState((prev) => ({
+                      endereco: {
+                        ...prev.endereco,
+                        bairro: text,
+                      },
+                    }))
+                  }
+                />
+                <Input
+                  label="Complemento"
+                  style={[styles.input]}
+                  defaultValue={endereco.complemento}
+                  onChangeText={(text) =>
+                    this.setState((prev) => ({
+                      endereco: {
+                        ...prev.endereco,
+                        complemento: text,
+                      },
+                    }))
+                  }
+                />
+                <Block>
+                  <Text gray2>Estado</Text>
+                  <Picker
+                    style={{
+                      height: 50,
+                      width: 150,
+                    }}
+                    selectedValue={endereco.uf}
+                    onValueChange={(v) =>
+                      this.setState((prev) => ({
+                        endereco: { ...prev.endereco, uf: v },
+                      }))
+                    }
+                    itemStyle={{ fontSize: 20 }}
+                  >
+                    {listaUF.map((uf) => (
+                      <Picker.Item key={`${uf}`} label={uf} value={uf} />
+                    ))}
+                  </Picker>
+                </Block>
+                <Input
+                  label="Cidade"
+                  style={[styles.input]}
+                  defaultValue={endereco.cidade}
+                  onChangeText={(text) =>
+                    this.setState((prev) => ({
+                      endereco: {
+                        ...prev.endereco,
+                        cidade: text,
+                      },
+                    }))
+                  }
+                />
+                <Button gradient onPress={() => this.saveEndereco()}>
+                  {loading ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text bold white center>
+                      Salvar
+                    </Text>
+                  )}
+                </Button>
               </Block>
-              <Input
-                label="Cidade"
-                style={[styles.input]}
-                defaultValue={endereco.cidade}
-                onChangeText={(text) =>
-                  this.setState((prev) => ({
-                    endereco: {
-                      ...prev.endereco,
-                      cidade: text,
-                    },
-                  }))
-                }
-              />
-              <Button gradient onPress={() => this.saveEndereco()}>
-                {loading ? (
-                  <ActivityIndicator size="small" color="white" />
-                ) : (
-                  <Text bold white center>
-                    Salvar
-                  </Text>
-                )}
-              </Button>
-            </Block>
-          </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
+          )}
         </ScrollView>
       </Block>
     );

@@ -55,11 +55,13 @@ export default class SignUp extends Component {
 
   onChange = (event, date) => {
     this.setShow(false);
-    const currentDate = date;
-    this.setState({
-      data_nascimento: moment(new Date(date)).format("DD/MM/YYYY"),
-      data_dateTime: moment(new Date(date)).format("DD/MM/YYYY"),
-    });
+    if (date) {
+      const currentDate = date;
+      this.setState({
+        data_nascimento: moment(new Date(date)).format("DD/MM/YYYY"),
+        data_dateTime: moment(new Date(date)).format("YYYY-MM-DD"),
+      });
+    }
   };
 
   setMode = (currentMode) => {
@@ -127,9 +129,7 @@ export default class SignUp extends Component {
             login: this.state.email,
             senha: this.state.dados_login.senha,
           },
-          data_nascimento: moment(new Date(this.state.data_datetime)).format(
-            "YYYY-MM-DD"
-          ),
+          data_nascimento: this.state.data_datetime,
           nome_completo: this.state.nome_completo,
           tipo_usuario: "PRESTADOR",
         });

@@ -1,19 +1,19 @@
 const categories = [
   {
-    id: "agendamentos",
-    name: "Agendamentos",
-    tags: ["menu"],
-    screen: "Agendamento",
-    count: 147,
-    image: require("../assets/icons/agendamentos.png"),
-  },
-  {
     id: "servicos",
     name: "Meu Negócio",
     tags: ["menu"],
     screen: "Servicos",
     count: 16,
     image: require("../assets/icons/servicos.png"),
+  },
+  {
+    id: "agendamentos",
+    name: "Agendamentos",
+    tags: ["menu"],
+    screen: "Agendamento",
+    count: 147,
+    image: require("../assets/icons/agendamentos.png"),
   },
   {
     id: "faturas",
@@ -56,15 +56,15 @@ const financeiro = [
     tags: ["menu"],
     screen: "Faturamento",
     count: 68,
-    image: require("../assets/icons/fatura.png"),
+    image: require("../assets/icons/dinheiro.png"),
   },
   {
-    id: "servicos",
+    id: "despesa",
     name: "Despesas",
     tags: ["menu"],
     screen: "Despesa",
     count: 16,
-    image: require("../assets/icons/servicos.png"),
+    image: require("../assets/icons/despesas.png"),
   },
   {
     id: "lucro",
@@ -72,7 +72,7 @@ const financeiro = [
     tags: ["menu"],
     screen: "Lucro",
     count: 147,
-    image: require("../assets/icons/agendamentos.png"),
+    image: require("../assets/icons/lucro.png"),
   },
 ];
 
@@ -472,24 +472,31 @@ const estudos = [
 const planos = [
   {
     id: 1,
-    nome: "Mentor",
+    nome: "i9Mentor",
     preco: 0.0,
     descricao:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris bibendum justo quis quam dictum mollis molestie eget velit. Curabitur vestibulum ultricies pretium. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent vulputate fermentum magna, non sodales tellus congue quis. Curabitur vestibulum sollicitudin imperdiet. Sed laoreet varius fringilla. Vivamus ligula turpis, lobortis et ante et, facilisis luctus quam. In venenatis volutpat iaculis. Nulla tempor felis et rutrum sagittis. Phasellus ornare tincidunt hendrerit. Nam condimentum laoreet nisl, nec fermentum nisi ultricies vel.",
+      "- Acesso às funcionalidades de gestão de caixa\n\n- Serviço de Agendamento\n\n- Relatório mensal do fluxo de caixa (Entrada-Saída)\n\n- Visão anual de P&L do negócio\n\n- Acesso ao material de estudo\n\n- Estratégia de marketing (Em breve)\n\n- Taxa por serviço (10% limitado a R$100,00)",
   },
   {
     id: 2,
-    nome: "Mentor Mais - Individual",
+    nome: "i9Mentor Mensal",
     preco: 30.0,
     descricao:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris bibendum justo quis quam dictum mollis molestie eget velit. Curabitur vestibulum ultricies pretium. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent vulputate fermentum magna, non sodales tellus congue quis. Curabitur vestibulum sollicitudin imperdiet. Sed laoreet varius fringilla. Vivamus ligula turpis, lobortis et ante et, facilisis luctus quam. In venenatis volutpat iaculis. Nulla tempor felis et rutrum sagittis. Phasellus ornare tincidunt hendrerit. Nam condimentum laoreet nisl, nec fermentum nisi ultricies vel.",
+      "- Funcionalidades do plano i9Mentor\n\n- Visa prestadores com alto número de serviços\n\n- R$30,00/mês (Aprox. R$1,00/dia)",
   },
   {
     id: 3,
-    nome: "Mentor Mais - Equipe",
+    nome: "i9Mentor Mensal+",
+    preco: 50.0,
+    descricao:
+      "- Funcionalidades do plano i9Mentor Mensal\n\n- Relatório mensal com visão diária de movimentação\n\n- Sugestões para alavancar os ganhos\n\nR$50,00/mês",
+  },
+  {
+    id: 4,
+    nome: "i9Mentor Mensal+ Equipe (EM BREVE)",
     preco: 70.0,
     descricao:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris bibendum justo quis quam dictum mollis molestie eget velit. Curabitur vestibulum ultricies pretium. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent vulputate fermentum magna, non sodales tellus congue quis. Curabitur vestibulum sollicitudin imperdiet. Sed laoreet varius fringilla. Vivamus ligula turpis, lobortis et ante et, facilisis luctus quam. In venenatis volutpat iaculis. Nulla tempor felis et rutrum sagittis. Phasellus ornare tincidunt hendrerit. Nam condimentum laoreet nisl, nec fermentum nisi ultricies vel.",
+      "- Funcionalidades do plano i9Mentor Mensal+\n\n- Gestão de funcionários\n\n- Relatório gerencial (Comissões. Vendas/Funcionário)\n\n- R$70,00/mês",
   },
 ];
 

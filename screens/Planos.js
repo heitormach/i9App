@@ -17,10 +17,6 @@ import { theme } from "../constants";
 const { width, height } = Dimensions.get("window");
 
 class Planos extends Component {
-  static navigationOptions = {
-    header: null,
-  };
-
   scrollX = new Animated.Value(0);
 
   state = {
@@ -109,7 +105,7 @@ class Planos extends Component {
           {this.renderSteps()}
         </Block>
         <Block middle flex={0.5} margin={[0, theme.sizes.padding * 2]}>
-          <Button gradient onPress={() => navigation.navigate("Login")}>
+          <Button gradient onPress={() => navigation.navigate("Browse")}>
             <Text center semibold white>
               Quero esse!
             </Text>
@@ -134,7 +130,7 @@ export default Planos;
 const styles = StyleSheet.create({
   stepsContainer: {
     position: "absolute",
-    bottom: theme.sizes.base * 3,
+    bottom: 0,
     right: 0,
     left: 0,
   },

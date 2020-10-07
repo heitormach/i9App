@@ -7,6 +7,7 @@ import {
   Image,
   SafeAreaView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import { Button, Block, Text } from "../components";
@@ -60,12 +61,12 @@ class FatMensal extends Component {
     mesSelected: new Date().getMonth() + 1,
     dataInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
     dataFim: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+    loading: false,
   };
 
   componentDidMount() {
     // this.setState({ fats: this.props.fats });
     const { dataInicio, dataFim } = this.state;
-    console.log(dataInicio);
     this.getTransacao(dataInicio, dataFim);
   }
 
@@ -77,6 +78,7 @@ class FatMensal extends Component {
     const usuario = JSON.parse(await AsyncStorage.getItem("@i9App:userDados"));
     this.setState({ usuario: usuario });
     try {
+      this.setState({ loading: true });
       const response = await apiTransacao.get("transacao/relatorio", {
         cpfPropietarioEstabelecimento: usuario.cpf,
         dataInicio: this.convertData(dataInicio),
@@ -84,10 +86,11 @@ class FatMensal extends Component {
       });
 
       this.setState({ faturamentos: response.data });
-      console.log(response);
+      this.setState({ loading: false });
     } catch (err) {
       //console.log(err);
       Alert.alert("Erro", JSON.stringify(err.data));
+      this.setState({ loading: false });
     }
   };
 
@@ -161,7 +164,7 @@ class FatMensal extends Component {
   renderTotal() {
     const { faturamentos } = this.state;
     return (
-      <Block row card shadow color="white" style={styles.fat}>
+      <Block row card shadow color="#fffcfc" style={styles.fat}>
         <Block flex={0.25} card column color="orange" style={styles.fatStatus}>
           <Block flex={0.25} middle center color={theme.colors.accent}>
             <Text size={10} white style={{ textTransform: "uppercase" }}>
@@ -192,7 +195,7 @@ class FatMensal extends Component {
 
   renderFat(fat) {
     return (
-      <Block row card shadow color="white" style={styles.fat}>
+      <Block row card shadow color="#fffcfc" style={styles.fat}>
         <Block
           flex={0.25}
           card
@@ -201,9 +204,7 @@ class FatMensal extends Component {
           style={styles.fatStatus}
         >
           <Block flex={0.25} middle center color={theme.colors.primary}>
-            <Text size={10} white style={{ textTransform: "uppercase" }}>
-              {fat.servico.nome}
-            </Text>
+            <Text size={10} white style={{ textTransform: "uppercase" }}></Text>
           </Block>
           <Block flex={0.7} center middle>
             <Text h2 white>
@@ -249,7 +250,7 @@ class FatMensal extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { meses, mesSelected } = this.state;
+    const { meses, mesSelected, loading } = this.state;
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -281,8 +282,9 @@ class FatMensal extends Component {
           </Picker>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
-          {this.renderChart()}
-          {this.renderFats()}
+          {loading === true && <ActivityIndicator size="large" color="green" />}
+          {loading === false && this.renderChart()}
+          {loading === false && this.renderFats()}
         </ScrollView>
       </Block>
     );

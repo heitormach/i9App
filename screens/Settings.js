@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { Image, StyleSheet, ScrollView, TextInput } from "react-native";
 import Slider from "react-native-slider";
-
+import moment from "moment";
 import { Divider, Button, Block, Text, Switch } from "../components";
 import { theme, mocks } from "../constants";
+import { AsyncStorage } from "react-native";
 
 class Settings extends Component {
   state = {
@@ -12,19 +13,32 @@ class Settings extends Component {
     notifications: true,
     newsletter: false,
     editing: null,
+    email: null,
     profile: {},
+    username: null,
+    password: null,
+    c_password: null,
+    errors: [],
+    usuario: {},
+    loading: false,
   };
 
   componentDidMount() {
     this.setState({ profile: this.props.profile });
+    this.getUsuario();
   }
 
   handleEdit(name, text) {
-    const { profile } = this.state;
+    const { usuario } = this.state;
     profile[name] = text;
 
-    this.setState({ profile });
+    this.setState({ usuario });
   }
+
+  getUsuario = async () => {
+    const usuario = JSON.parse(await AsyncStorage.getItem("@i9App:userDados"));
+    this.setState({ usuario: usuario });
+  };
 
   toggleEdit(name) {
     const { editing } = this.state;
@@ -32,22 +46,22 @@ class Settings extends Component {
   }
 
   renderEdit(name) {
-    const { profile, editing } = this.state;
+    const { usuario, editing } = this.state;
 
     if (editing === name) {
       return (
         <TextInput
-          defaultValue={profile[name]}
+          defaultValue={usuario[name]}
           onChangeText={(text) => this.handleEdit([name], text)}
         />
       );
     }
 
-    return <Text bold>{profile[name]}</Text>;
+    return <Text bold>{usuario[name]}</Text>;
   }
 
   render() {
-    const { profile, editing } = this.state;
+    const { profile, editing, usuario } = this.state;
 
     return (
       <Block>
@@ -62,46 +76,19 @@ class Settings extends Component {
 
         <ScrollView showsVerticalScrollIndicator={false}>
           <Block style={styles.inputs}>
-            <Block row space="between" margin={[10, 0]} style={styles.inputRow}>
-              <Block>
-                <Text gray2 style={{ marginBottom: 10 }}>
-                  Usuário
-                </Text>
-                {this.renderEdit("username")}
-              </Block>
-              <Text
-                medium
-                secondary
-                onPress={() => this.toggleEdit("username")}
-              >
-                {editing === "username" ? "Salvar" : "Editar"}
-              </Text>
-            </Block>
-            <Block row space="between" margin={[10, 0]} style={styles.inputRow}>
-              <Block>
-                <Text gray2 style={{ marginBottom: 10 }}>
-                  E-mail
-                </Text>
-                <Text bold>{profile.email}</Text>
-              </Block>
-            </Block>
-          </Block>
-
-          <Divider />
-
-          <Block style={styles.toggles}>
-            <Block
-              row
-              center
-              space="between"
-              style={{ marginBottom: theme.sizes.base * 2 }}
-            >
-              <Text gray2>Notificações</Text>
-              <Switch
-                value={this.state.newsletter}
-                onValueChange={(value) => this.setState({ newsletter: value })}
-              />
-            </Block>
+            <Text>{usuario.email}</Text>
+            <Input
+              email
+              label="Email"
+              error={hasErrors("email")}
+              style={[styles.input, hasErrors("email")]}
+              defaultValue={usuario.email}
+              onChangeText={(text) => {
+                usuario.email = text;
+                usuario.contato.email = text;
+                usuario.n.login = text;
+              }}
+            />
           </Block>
         </ScrollView>
       </Block>
@@ -122,6 +109,12 @@ const styles = StyleSheet.create({
   avatar: {
     height: theme.sizes.base * 2.2,
     width: theme.sizes.base * 2.2,
+  },
+  input: {
+    borderRadius: 0,
+    borderWidth: 0,
+    borderBottomColor: theme.colors.gray2,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   inputs: {
     marginTop: theme.sizes.base * 0.7,

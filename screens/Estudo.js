@@ -59,7 +59,6 @@ class Estudo extends Component {
 
   renderEstudo() {
     const { estudoSelected } = this.state;
-    console.log(estudoSelected);
     return (
       <Modal
         animationType="slide"
@@ -81,6 +80,7 @@ class Estudo extends Component {
                 </Text>
                 {est.paragrafos.map((cont) => (
                   <Text
+                    key={cont}
                     caption
                     gray
                     height={24}
@@ -138,12 +138,13 @@ class Estudo extends Component {
                   this.setState({ estudoSelected: estudo, showEstudo: true });
                 }}
               >
-                <Card center middle shadow style={styles.estudo}>
-                  <Badge
-                    margin={[0, 0, 15]}
-                    size={40}
-                    color="rgba(37, 130, 91, 0.2)"
-                  ></Badge>
+                <Card
+                  center
+                  middle
+                  color="#fffcfc"
+                  shadow
+                  style={styles.estudo}
+                >
                   <Text center medium height={20}>
                     {estudo.nome}
                   </Text>

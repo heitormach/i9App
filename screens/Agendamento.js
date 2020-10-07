@@ -106,7 +106,6 @@ class Agendamento extends Component {
   }
 
   changeServico(servico) {
-    console.log(servico);
     this.setState((prev) => ({
       agendamento: {
         ...prev.agendamento,
@@ -151,6 +150,7 @@ class Agendamento extends Component {
     }));
     this.setState({ usuario: usuario });
     try {
+      this.setState({ loading: true });
       const response = await apiAgendamento.get("agendamento", {
         cpfPropEstab: usuario.cpf,
         dataInicio: this.convertData(dataInicio),
@@ -158,14 +158,16 @@ class Agendamento extends Component {
         status: status,
       });
 
-      this.setState({ agendamentos: response.data });
+      this.setState({ agendamentos: response.data, loading: false });
     } catch (err) {
       console.log(err);
       Alert.alert("Erro", JSON.stringify(err.data));
+      this.setState({ loading: false });
     }
   };
 
   getServicos = async () => {
+    const { navigation } = this.props;
     const usuario = JSON.parse(await AsyncStorage.getItem("@i9App:userDados"));
     this.setState({ usuario: usuario });
 
@@ -174,13 +176,29 @@ class Agendamento extends Component {
         cpfProprietario: usuario.cpf,
       });
 
-      this.setState((prev) => ({
-        servicos: response.data,
-        agendamento: {
-          ...prev.agendamento,
-          servico: response.data[0].servico,
-        },
-      }));
+      if (response.data.length === 0) {
+        Alert.alert(
+          "Atenção",
+          "Para utilizar o serviço de agendamento, \nvocê deve primeiro atualizar os dados\n do seu negócio e cadastrar um serviço.",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                navigation.navigate("Servicos");
+              },
+            },
+          ]
+        );
+      }
+      if (response.data.length > 0) {
+        this.setState((prev) => ({
+          servicos: response.data,
+          agendamento: {
+            ...prev.agendamento,
+            servico: response.data[0].servico,
+          },
+        }));
+      }
     } catch (err) {
       console.log(err);
       Alert.alert("Erro", JSON.stringify(err.data));
@@ -615,7 +633,7 @@ class Agendamento extends Component {
           </Block>
           <Block flex={0.7} center middle>
             <Text h2 white>
-              {new Date(agend.data_agendamento.substring(0, 10)).getDate()}
+              {new Date(agend.data_agendamento.substring(0, 10)).getDate() + 1}
             </Text>
           </Block>
         </Block>
@@ -671,7 +689,7 @@ class Agendamento extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { meses, mesSelected } = this.state;
+    const { meses, mesSelected, loading } = this.state;
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -703,7 +721,11 @@ class Agendamento extends Component {
           </Picker>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
-          {this.renderAgends()}
+          {loading ? (
+            <ActivityIndicator size="large" color="green" />
+          ) : (
+            this.renderAgends()
+          )}
         </ScrollView>
         <TouchableOpacity
           onPress={() => this.setState({ showNewService: true })}

@@ -8,25 +8,44 @@ import {
   Image,
   SafeAreaView,
   View,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import { Button, Block, Text, Switch } from "../components";
 import { theme, mocks } from "../constants";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 const { width } = Dimensions.get("window");
 import { BarChart, Grid, YAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
 import { Picker } from "@react-native-community/picker";
+import { AsyncStorage } from "react-native";
+import apiTransacao from "../services/apiTransacao";
 
 class FatAnual extends Component {
   state = {
-    faturamentos: [],
+    faturamentos: {
+      quantidade_total: 0,
+      servicos: [
+        {
+          percentual_valor_total: 0,
+          quantidade: 0,
+          servico: {
+            descricao: "",
+            nome: "",
+            preco: 0,
+          },
+          valor: 0,
+        },
+      ],
+      valor_total: 0,
+    },
     isDateTimePickerVisible: false,
     faturamentoSelected: {},
     showWeek: false,
     horaSelected: {},
     showTimePicker: false,
+    usuario: {},
     anos: [
       "2010",
       "2011",
@@ -40,35 +59,54 @@ class FatAnual extends Component {
       "2019",
       "2020",
     ],
-    anoSelected: "2020",
+    anoSelected: String(new Date().getFullYear()),
+    dataInicio: new Date(new Date().getFullYear(), 1, 1),
+    dataFim: new Date(new Date().getFullYear(), 12, 31),
+    loading: false,
   };
 
   componentDidMount() {
-    this.setState({ fats: this.props.fats });
+    // this.setState({ fats: this.props.fats });
+    const { dataInicio, dataFim } = this.state;
+    this.getTransacao(dataInicio, dataFim);
   }
 
   selectWeekDay(faturamento) {
     this.setState({ faturamentoSelected: faturamento, showWeek: true });
   }
 
-  anoSelected(faturamento, tipo) {
-    this.setState({
-      anoSelected: { ano: faturamento, tipo: tipo },
-      showTimePicker: true,
-    });
+  convertData(date) {
+    return moment(date).format("YYYY-MM-DD");
   }
 
-  handleTime(event, date, tipo) {
-    this.setState({ showTimePicker: false });
-    if (tipo === "ini") {
-      this.state.faturamentoSelected.horaIni = new Date(date);
-    } else {
-      this.state.faturamentoSelected.horaFim = new Date(date);
+  getTransacao = async (dataInicio, dataFim) => {
+    const usuario = JSON.parse(await AsyncStorage.getItem("@i9App:userDados"));
+    this.setState({ usuario: usuario });
+
+    try {
+      this.setState({ loading: true });
+      const response = await apiTransacao.get("transacao/relatorio", {
+        cpfPropietarioEstabelecimento: usuario.cpf,
+        dataInicio: this.convertData(dataInicio),
+        dataFim: this.convertData(dataFim),
+      });
+
+      this.setState({ faturamentos: response.data });
+      this.setState({ loading: false });
+    } catch (err) {
+      //console.log(err);
+      Alert.alert("Erro", JSON.stringify(err.data));
+      this.setState({ loading: false });
     }
+  };
+
+  onChangeYear(year) {
+    this.setState({ anoSelected: year });
+    this.getTransacao(new Date(year, 1, 1), new Date(year, 12, 31));
   }
 
   renderChart() {
-    const { fats } = this.props;
+    const { faturamentos } = this.state;
 
     return (
       <Block row card shadow color="white" style={styles.fats}>
@@ -76,18 +114,20 @@ class FatAnual extends Component {
           style={{ flexDirection: "row", height: 150, paddingVertical: 5 }}
         >
           <YAxis
-            data={fats}
+            data={faturamentos.servicos}
             yAccessor={({ index }) => index}
             contentInset={{ top: 10, bottom: 10 }}
             scale={scale.scaleBand}
             spacing={0.2}
-            formatLabel={(_, index) => fats[index].nome}
+            formatLabel={(_, index) =>
+              faturamentos.servicos[index].servico.nome
+            }
           />
           <BarChart
             style={{ flex: 1, marginLeft: 8 }}
-            data={fats}
+            data={faturamentos.servicos}
             horizontal={true}
-            yAccessor={({ item }) => item.qtd * item.total}
+            yAccessor={({ item }) => Number(item.percentual_valor_total)}
             svg={{ fill: theme.colors.primary }}
             contentInset={{ top: 10, bottom: 10 }}
             spacing={0.2}
@@ -101,8 +141,9 @@ class FatAnual extends Component {
   }
 
   renderTotal() {
+    const { faturamentos } = this.state;
     return (
-      <Block row card shadow color="white" style={styles.fat}>
+      <Block row card shadow color="#fffcfc" style={styles.fat}>
         <Block flex={0.25} card column color="orange" style={styles.fatStatus}>
           <Block flex={0.25} middle center color={theme.colors.accent}>
             <Text size={10} white style={{ textTransform: "uppercase" }}>
@@ -111,19 +152,19 @@ class FatAnual extends Component {
           </Block>
           <Block flex={0.7} center middle>
             <Text h4 white>
-              R$ 2.000
+              R$ {Number(faturamentos.valor_total).toFixed(2)}
             </Text>
             <Text h5 white>
-              53 feitos
+              {faturamentos.quantidade_total} feitos
             </Text>
           </Block>
         </Block>
         <Block flex={0.75} column middle>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Você realizou 53 serviços no ano
+            Você realizou {faturamentos.quantidade_total} serviços no ano
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Valor Total Arrecadado: R$ 2.000,00
+            Valor Total Arrecadado: R$ {faturamentos.valor_total}
           </Text>
           <Text caption semibold></Text>
         </Block>
@@ -133,7 +174,7 @@ class FatAnual extends Component {
 
   renderFat(fat) {
     return (
-      <Block row card shadow color="white" style={styles.fat}>
+      <Block row card shadow color="#fffcfc" style={styles.fat}>
         <Block
           flex={0.25}
           card
@@ -142,25 +183,23 @@ class FatAnual extends Component {
           style={styles.fatStatus}
         >
           <Block flex={0.25} middle center color={theme.colors.primary}>
-            <Text size={10} white style={{ textTransform: "uppercase" }}>
-              {fat.nome}
-            </Text>
+            <Text size={10} white style={{ textTransform: "uppercase" }}></Text>
           </Block>
           <Block flex={0.7} center middle>
             <Text h2 white>
-              R$ {fat.total}
+              R$ {fat.valor}
             </Text>
             <Text h5 white>
-              {fat.qtd} feitos
+              {fat.quantidade} feitos
             </Text>
           </Block>
         </Block>
         <Block flex={0.75} column middle>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Você realizou {fat.qtd} {fat.nome}
+            Você realizou {fat.quantidade} {fat.servico.nome}
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Valor Arrecadado: R$ {fat.total}
+            Valor Arrecadado: R$ {Number(fat.valor).toFixed(2)}
           </Text>
           <Text caption semibold></Text>
         </Block>
@@ -169,14 +208,17 @@ class FatAnual extends Component {
   }
 
   renderFats() {
-    const { fats } = this.props;
+    const { faturamentos } = this.state;
 
     return (
       <Block flex={0.8} column style={styles.fats}>
         <SafeAreaView style={styles.safe}>
           {this.renderTotal()}
-          {fats.map((fat) => (
-            <TouchableOpacity activeOpacity={0.8} key={`fat-${fat.id}`}>
+          {faturamentos.servicos.map((fat) => (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              key={`fat-${fat.percentual_valor_total}${fat.valor}`}
+            >
               {this.renderFat(fat)}
             </TouchableOpacity>
           ))}
@@ -187,7 +229,7 @@ class FatAnual extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { anos } = this.state;
+    const { anos, anoSelected, loading } = this.state;
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -205,8 +247,8 @@ class FatAnual extends Component {
               width: 200,
               transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],
             }}
-            selectedValue={this.state.anoSelected}
-            onValueChange={(v) => this.setState({ anoSelected: v })}
+            selectedValue={anoSelected}
+            onValueChange={(v) => this.onChangeYear(v)}
             itemStyle={{ fontSize: 20 }}
           >
             {anos.map((ano) => (
@@ -215,8 +257,9 @@ class FatAnual extends Component {
           </Picker>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
-          {this.renderChart()}
-          {this.renderFats()}
+          {loading === true && <ActivityIndicator size="large" color="green" />}
+          {loading === false && this.renderChart()}
+          {loading === false && this.renderFats()}
         </ScrollView>
       </Block>
     );

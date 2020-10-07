@@ -107,7 +107,11 @@ class Browse extends Component {
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
           <Text h1 bold>
-            Olá, {this.state.usuario.nome_completo}
+            Olá,{" "}
+            {String(this.state.usuario.nome_completo).substring(
+              0,
+              String(this.state.usuario.nome_completo).indexOf(" ")
+            )}
           </Text>
           <Button onPress={() => navigation.navigate("Settings")}>
             <Image source={profile.avatar} style={styles.avatar} />

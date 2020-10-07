@@ -246,7 +246,7 @@ class ServicosDia extends Component {
           space="between"
         >
           <Text h1 light>
-            {servicoSelected.servico.nome} - {dataCorrect.getDate()}/
+            {servicoSelected.servico.nome} - {dataCorrect.getDate() + 1}/
             {dataCorrect.getMonth() + 1}
           </Text>
           <ScrollView style={{ marginVertical: theme.sizes.padding }}>
@@ -347,7 +347,7 @@ class ServicosDia extends Component {
         </Block>
         <Block flex={false} row space="between" style={styles.servHeader}>
           <Text h1 light>
-            Agenda - {dataCorrect.getDate()}/{dataCorrect.getMonth() + 1}
+            Agenda - {dataCorrect.getDate() + 1}/{dataCorrect.getMonth() + 1}
           </Text>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
