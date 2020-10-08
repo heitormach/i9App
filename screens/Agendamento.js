@@ -241,6 +241,17 @@ class Agendamento extends Component {
       });
       Alert.alert("Salvo!", "Dados salvos com sucesso.");
       this.getAgendamentos("", dataIni, dataFim);
+      this.setState({
+        agendamento: {
+          cpf_prop_estab: null,
+          data_hora: new Date(),
+          status: "PENDENTE",
+          cliente: {
+            endereco: {},
+          },
+          servico: {},
+        },
+      });
     } catch (err) {
       this.setState({ loading: false });
       Alert.alert("Erro", JSON.stringify(err.data));
