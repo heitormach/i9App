@@ -85,7 +85,7 @@ class FatAnual extends Component {
 
     try {
       this.setState({ loading: true });
-      const response = await apiTransacao.get("transacao/relatorio", {
+      const response = await apiTransacao.get("relatorio/faturamento", {
         cpfPropietarioEstabelecimento: usuario.cpf,
         dataInicio: this.convertData(dataInicio),
         dataFim: this.convertData(dataFim),
