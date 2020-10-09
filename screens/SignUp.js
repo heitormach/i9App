@@ -59,7 +59,7 @@ export default class SignUp extends Component {
       const currentDate = date;
       this.setState({
         data_nascimento: moment(new Date(date)).format("DD/MM/YYYY"),
-        data_dateTime: moment(new Date(date)).format("YYYY-MM-DD"),
+        data_datetime: moment(new Date(date)).format("YYYY-MM-DD"),
       });
     }
   };
@@ -161,7 +161,7 @@ export default class SignUp extends Component {
             Cadastro
           </Text>
         </Block>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView>
           <Block middle style={styles.inputs}>
             <Input
               email
@@ -184,9 +184,10 @@ export default class SignUp extends Component {
             />
             <Input
               label="CPF"
+              number
               error={hasErrors("cpf")}
               style={[styles.input, hasErrors("cpf")]}
-              defaultValue={this.state.cpf}
+              defaultValue={String(this.state.cpf)}
               onChangeText={(text) => this.setState({ cpf: text })}
               maxLength={11}
             />

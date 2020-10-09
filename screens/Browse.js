@@ -27,8 +27,13 @@ class Browse extends Component {
   };
 
   componentDidMount() {
+    const { navigation } = this.props;
     this.setState({ categories: this.props.categories });
     this.buscarDadosUser();
+
+    navigation.addListener("willFocus", () => {
+      this.buscarDadosUser();
+    });
   }
 
   logoutAlert() {
@@ -54,22 +59,18 @@ class Browse extends Component {
 
   buscarDadosUser = async () => {
     const usuario = await AsyncStorage.getItem("@i9App:userDados");
-    if (usuario !== null) {
-      this.setState({ usuario: JSON.parse(usuario) });
-    } else {
-      try {
-        const response = await apiUsuario.get("/usuarios", {
-          findByToken: "true",
-        });
+    try {
+      const response = await apiUsuario.get("/usuarios", {
+        findByToken: "true",
+      });
 
-        this.setState({ usuario: response.data });
-        await AsyncStorage.multiSet([
-          ["@i9App:userDados", JSON.stringify(response.data)],
-        ]);
-      } catch (err) {
-        Alert.alert("ERRO", "Erro ao buscar informações do usuário");
-        console.log(err.data.message);
-      }
+      this.setState({ usuario: response.data });
+      await AsyncStorage.multiSet([
+        ["@i9App:userDados", JSON.stringify(response.data)],
+      ]);
+    } catch (err) {
+      Alert.alert("ERRO", "Erro ao buscar informações do usuário");
+      console.log(err.data.message);
     }
   };
   handleTab = (tab) => {
