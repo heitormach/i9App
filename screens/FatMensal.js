@@ -207,7 +207,7 @@ class FatMensal extends Component {
             <Text size={10} white style={{ textTransform: "uppercase" }}></Text>
           </Block>
           <Block flex={0.7} center middle>
-            <Text h2 white>
+            <Text h4 white>
               R$ {fat.valor}
             </Text>
             <Text h5 white>
@@ -217,7 +217,10 @@ class FatMensal extends Component {
         </Block>
         <Block flex={0.75} column middle>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Você realizou {fat.quantidade} {fat.servico.nome}
+            {fat.servico.nome}
+          </Text>
+          <Text h4 style={{ paddingVertical: 8 }}>
+            Você realizou {fat.quantidade}
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
             Valor Arrecadado: R$ {fat.valor}

@@ -196,10 +196,13 @@ class FatAnual extends Component {
         </Block>
         <Block flex={0.75} column middle>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Você realizou {fat.quantidade} {fat.servico.nome}
+            {fat.servico.nome}
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Valor Arrecadado: R$ {Number(fat.valor).toFixed(2)}
+            Você realizou {fat.quantidade}
+          </Text>
+          <Text h4 style={{ paddingVertical: 8 }}>
+            Valor Arrecadado: R$ {fat.valor}
           </Text>
           <Text caption semibold></Text>
         </Block>

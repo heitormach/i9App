@@ -60,6 +60,32 @@ class Settings extends Component {
     });
   }
 
+  handleLogin = async () => {
+    const { usuariobkp } = this.state;
+    try {
+      this.setState({ loading: true });
+
+      const response = await apiUsuario.post("/usuarios/token", null, {
+        params: {
+          login: usuariobkp.dados_login.login,
+          senha: usuariobkp.dados_login.senha,
+          tipo_usuario: "PRESTADOR",
+        },
+      });
+
+      await AsyncStorage.multiSet([
+        ["@i9App:token", JSON.stringify(response.data.token)],
+        ["@i9App:user", JSON.stringify(response.data)],
+      ]);
+
+      this.buscarDadosUser();
+    } catch (err) {
+      Alert.alert("ERRO", JSON.stringify(err.data));
+      console.log(err);
+      this.setState({ loading: false });
+    }
+  };
+
   buscarDadosUser = async () => {
     const usuario = await AsyncStorage.getItem("@i9App:userDados");
     try {
@@ -73,7 +99,7 @@ class Settings extends Component {
       ]);
     } catch (err) {
       Alert.alert("ERRO", "Erro ao buscar informações do usuário");
-      console.log(err.data.message);
+      console.log(err);
     }
   };
 
@@ -81,7 +107,7 @@ class Settings extends Component {
     const usuario = JSON.parse(await AsyncStorage.getItem("@i9App:userDados"));
     this.setState({
       usuario: usuario,
-      senhaAnterior: usuario.dados_login.senha,
+      senhaAtual: usuario.dados_login.senha,
       usuariobkp: usuario,
     });
   };
@@ -108,7 +134,6 @@ class Settings extends Component {
       const response = await apiUsuario.patch("/usuarios", usuario);
       Alert.alert("Alterado!", "Dados do usuário alterados com sucesso");
       this.setState({ loading: false });
-      this.buscarDadosUser();
     } catch (err) {
       Alert.alert("Erro", JSON.stringify(err.data));
       this.setState({ loading: false });
@@ -123,7 +148,6 @@ class Settings extends Component {
       senhaAtualDigitada,
       confirmarSenha,
     } = this.state;
-
     if (senhaAtual !== senhaAtualDigitada) {
       Alert.alert("Erro", "Senha atual incorreta.");
     } else if (usuario.dados_login.senha !== confirmarSenha) {
@@ -134,11 +158,19 @@ class Settings extends Component {
     } else {
       try {
         this.setState({ loading: true });
-        usuariobkp.dados_login.senha = usuario.dados_login.senha;
+        this.setState((prev) => ({
+          usuariobkp: {
+            ...prev.usuariobkp,
+            dados_login: {
+              ...prev.usuariobkp.dados_login,
+              senha: confirmarSenha,
+            },
+          },
+        }));
         const response = await apiUsuario.patch("/usuarios", usuariobkp);
         Alert.alert("Alterado!", "Senha alterada com sucesso.");
         this.setState({ loading: false });
-        this.buscarDadosUser();
+        this.handleLogin();
       } catch (err) {
         Alert.alert("Erro", JSON.stringify(err.data));
         this.setState({ loading: false });
@@ -162,16 +194,9 @@ class Settings extends Component {
   }
 
   render() {
-    const {
-      profile,
-      usuario,
-      loading,
-      alteraSenha,
-      senhaAnterior,
-      confirmarSenha,
-    } = this.state;
+    const { profile, usuario, loading, alteraSenha, usuariobkp } = this.state;
 
-    console.log(usuario);
+    console.log("Usuário", usuario);
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -255,7 +280,7 @@ class Settings extends Component {
                         usuario: {
                           ...prev.usuario,
                           dados_login: {
-                            ...prev.dados_login,
+                            ...prev.usuario.dados_login,
                             senha: text,
                           },
                         },

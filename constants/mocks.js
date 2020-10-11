@@ -62,7 +62,7 @@ const financeiro = [
     id: "despesa",
     name: "Despesas",
     tags: ["menu"],
-    screen: "Despesa",
+    screen: "Despesas",
     count: 16,
     image: require("../assets/icons/despesas.png"),
   },
