@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Linking,
 } from "react-native";
 
 import { Card, Badge, Button, Block, Text } from "../components";
@@ -149,6 +150,25 @@ class Browse extends Component {
                 </Card>
               </TouchableOpacity>
             ))}
+            <TouchableOpacity
+              key={"ajuda"}
+              onPress={() => Linking.openURL("tel:11999191751")}
+            >
+              <Card
+                color="#fffcfc"
+                center
+                middle
+                shadow
+                style={styles.category}
+              >
+                <Badge margin={[0, 0, 15]} size={40}>
+                  <Image source={require("../assets/icons/ajuda.png")} />
+                </Badge>
+                <Text medium height={20}>
+                  Ajuda
+                </Text>
+              </Card>
+            </TouchableOpacity>
             <TouchableOpacity key={"logout"} onPress={() => this.logoutAlert()}>
               <Card
                 color="#fffcfc"

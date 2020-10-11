@@ -22,6 +22,7 @@ import apiNegocio from "../services/apiNegocio";
 import { AsyncStorage } from "react-native";
 import apiEndereco from "../services/apiEndereco";
 
+
 class Agendamento extends Component {
   state = {
     agendamentos: [],
@@ -399,43 +400,35 @@ class Agendamento extends Component {
                 </Block>
               </Block>
               <Block>
-                <Block style={styles.inputs}>
-                  <Input
-                    label="Nome do Cliente"
-                    style={[styles.input]}
-                    defaultValue={agendamento.cliente.nome}
-                    onChangeText={(text) =>
-                      this.setState((prev) => ({
-                        agendamento: {
-                          ...prev.agendamento,
-                          cliente: { ...prev.agendamento.cliente, nome: text },
-                        },
-                      }))
-                    }
-                  />
-                  <Input
-                    label="CPF (Opcional)"
-                    style={[styles.input]}
-                    defaultValue={agendamento.cliente.cpf}
-                    onChangeText={(text) =>
-                      this.setState((prev) => ({
-                        agendamento: {
-                          ...prev.agendamento,
-                          cliente: { ...prev.agendamento.cliente, cpf: text },
-                        },
-                      }))
-                    }
-                  />
-                </Block>
+                <Input
+                  label="Nome do Cliente"
+                  style={[styles.input]}
+                  defaultValue={agendamento.cliente.nome}
+                  onChangeText={(text) =>
+                    this.setState((prev) => ({
+                      agendamento: {
+                        ...prev.agendamento,
+                        cliente: { ...prev.agendamento.cliente, nome: text },
+                      },
+                    }))
+                  }
+                />
+                <Input
+                  label="CPF (Opcional)"
+                  style={[styles.input]}
+                  defaultValue={agendamento.cliente.cpf}
+                  onChangeText={(text) =>
+                    this.setState((prev) => ({
+                      agendamento: {
+                        ...prev.agendamento,
+                        cliente: { ...prev.agendamento.cliente, cpf: text },
+                      },
+                    }))
+                  }
+                />
               </Block>
               {showEndereco && (
-                <Block
-                  flex={false}
-                  row
-                  center
-                  space="between"
-                  style={{ paddingHorizontal: theme.sizes.base * 2 }}
-                >
+                <Block flex={false} row space="between">
                   <Text h3>Endereço do Cliente</Text>
                 </Block>
               )}
@@ -478,13 +471,117 @@ class Agendamento extends Component {
     const { agendamento, listaUF } = this.state;
     return (
       <Block>
-        <Block style={styles.inputs}>
-          <Input
-            label="CEP"
-            style={[styles.input]}
-            defaultValue={agendamento.cliente.endereco.cep}
-            onBlur={() => this.getByCep(agendamento.cliente.endereco.cep)}
-            onChangeText={(text) =>
+        <Input
+          label="CEP"
+          style={[styles.input]}
+          defaultValue={agendamento.cliente.endereco.cep}
+          onBlur={() => this.getByCep(agendamento.cliente.endereco.cep)}
+          onChangeText={(text) =>
+            this.setState((prev) => ({
+              agendamento: {
+                ...prev.agendamento,
+                cliente: {
+                  ...prev.agendamento.cliente,
+                  endereco: {
+                    ...prev.agendamento.cliente.endereco,
+                    cep: text,
+                  },
+                },
+              },
+            }))
+          }
+        />
+        <Input
+          label="Rua"
+          number
+          style={[styles.input]}
+          defaultValue={agendamento.cliente.endereco.logradouro}
+          onChangeText={(text) =>
+            this.setState((prev) => ({
+              agendamento: {
+                ...prev.agendamento,
+                cliente: {
+                  ...prev.agendamento.cliente,
+                  endereco: {
+                    ...prev.agendamento.cliente.endereco,
+                    logradouro: text,
+                  },
+                },
+              },
+            }))
+          }
+        />
+        <Input
+          label="Número"
+          number
+          style={[styles.input]}
+          defaultValue={String(
+            agendamento.cliente.endereco.numero
+              ? agendamento.cliente.endereco.numero
+              : ""
+          )}
+          onChangeText={(text) =>
+            this.setState((prev) => ({
+              agendamento: {
+                ...prev.agendamento,
+                cliente: {
+                  ...prev.agendamento.cliente,
+                  endereco: {
+                    ...prev.agendamento.cliente.endereco,
+                    numero: text,
+                  },
+                },
+              },
+            }))
+          }
+        />
+        <Input
+          label="Bairro"
+          style={[styles.input]}
+          defaultValue={agendamento.cliente.endereco.bairro}
+          onChangeText={(text) =>
+            this.setState((prev) => ({
+              agendamento: {
+                ...prev.agendamento,
+                cliente: {
+                  ...prev.agendamento.cliente,
+                  endereco: {
+                    ...prev.agendamento.cliente.endereco,
+                    bairro: text,
+                  },
+                },
+              },
+            }))
+          }
+        />
+        <Input
+          label="Complemento"
+          style={[styles.input]}
+          defaultValue={agendamento.cliente.endereco.complemento}
+          onChangeText={(text) =>
+            this.setState((prev) => ({
+              agendamento: {
+                ...prev.agendamento,
+                cliente: {
+                  ...prev.agendamento.cliente,
+                  endereco: {
+                    ...prev.agendamento.cliente.endereco,
+                    complemento: text,
+                  },
+                },
+              },
+            }))
+          }
+        />
+        <Block>
+          <Text gray2>Estado</Text>
+          <Picker
+            style={{
+              height: 50,
+              width: 150,
+            }}
+            selectedValue={agendamento.cliente.endereco.uf}
+            onValue={(v) =>
               this.setState((prev) => ({
                 agendamento: {
                   ...prev.agendamento,
@@ -492,144 +589,38 @@ class Agendamento extends Component {
                     ...prev.agendamento.cliente,
                     endereco: {
                       ...prev.agendamento.cliente.endereco,
-                      cep: text,
+                      uf: v,
                     },
                   },
                 },
               }))
             }
-          />
-          <Input
-            label="Rua"
-            number
-            style={[styles.input]}
-            defaultValue={agendamento.cliente.endereco.logradouro}
-            onChangeText={(text) =>
-              this.setState((prev) => ({
-                agendamento: {
-                  ...prev.agendamento,
-                  cliente: {
-                    ...prev.agendamento.cliente,
-                    endereco: {
-                      ...prev.agendamento.cliente.endereco,
-                      logradouro: text,
-                    },
-                  },
-                },
-              }))
-            }
-          />
-          <Input
-            label="Número"
-            number
-            style={[styles.input]}
-            defaultValue={String(
-              agendamento.cliente.endereco.numero
-                ? agendamento.cliente.endereco.numero
-                : ""
-            )}
-            onChangeText={(text) =>
-              this.setState((prev) => ({
-                agendamento: {
-                  ...prev.agendamento,
-                  cliente: {
-                    ...prev.agendamento.cliente,
-                    endereco: {
-                      ...prev.agendamento.cliente.endereco,
-                      numero: text,
-                    },
-                  },
-                },
-              }))
-            }
-          />
-          <Input
-            label="Bairro"
-            style={[styles.input]}
-            defaultValue={agendamento.cliente.endereco.bairro}
-            onChangeText={(text) =>
-              this.setState((prev) => ({
-                agendamento: {
-                  ...prev.agendamento,
-                  cliente: {
-                    ...prev.agendamento.cliente,
-                    endereco: {
-                      ...prev.agendamento.cliente.endereco,
-                      bairro: text,
-                    },
-                  },
-                },
-              }))
-            }
-          />
-          <Input
-            label="Complemento"
-            style={[styles.input]}
-            defaultValue={agendamento.cliente.endereco.complemento}
-            onChangeText={(text) =>
-              this.setState((prev) => ({
-                agendamento: {
-                  ...prev.agendamento,
-                  cliente: {
-                    ...prev.agendamento.cliente,
-                    endereco: {
-                      ...prev.agendamento.cliente.endereco,
-                      complemento: text,
-                    },
-                  },
-                },
-              }))
-            }
-          />
-          <Block>
-            <Text gray2>Estado</Text>
-            <Picker
-              style={{
-                height: 50,
-                width: 150,
-              }}
-              selectedValue={agendamento.cliente.endereco.uf}
-              onValue={(v) =>
-                this.setState((prev) => ({
-                  agendamento: {
-                    ...prev.agendamento,
-                    cliente: {
-                      ...prev.agendamento.cliente,
-                      endereco: {
-                        ...prev.agendamento.cliente.endereco,
-                        uf: v,
-                      },
-                    },
-                  },
-                }))
-              }
-              itemStyle={{ fontSize: 20 }}
-            >
-              {listaUF.map((uf) => (
-                <Picker.Item key={`${uf}`} label={uf} value={uf} />
-              ))}
-            </Picker>
-          </Block>
-          <Input
-            label="Cidade"
-            style={[styles.input]}
-            defaultValue={agendamento.cliente.endereco.cidade}
-            onChangeText={(text) =>
-              this.setState((prev) => ({
-                agendamento: {
-                  ...prev.agendamento,
-                  cliente: {
-                    ...prev.agendamento.cliente,
-                    endereco: {
-                      ...prev.agendamento.cliente.endereco,
-                      cidade: text,
-                    },
-                  },
-                },
-              }))
-            }
-          />
+            itemStyle={{ fontSize: 20 }}
+          >
+            {listaUF.map((uf) => (
+              <Picker.Item key={`${uf}`} label={uf} value={uf} />
+            ))}
+          </Picker>
         </Block>
+        <Input
+          label="Cidade"
+          style={[styles.input]}
+          defaultValue={agendamento.cliente.endereco.cidade}
+          onChangeText={(text) =>
+            this.setState((prev) => ({
+              agendamento: {
+                ...prev.agendamento,
+                cliente: {
+                  ...prev.agendamento.cliente,
+                  endereco: {
+                    ...prev.agendamento.cliente.endereco,
+                    cidade: text,
+                  },
+                },
+              },
+            }))
+          }
+        />
       </Block>
     );
   }

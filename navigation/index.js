@@ -28,6 +28,7 @@ import Negocio from "../screens/Negocio";
 import Endereco from "../screens/Endereco";
 import Financeiro from "../screens/Financeiro";
 import Despesas from "../screens/Despesas";
+import Lucro from "../screens/Lucro";
 import { theme } from "../constants";
 
 const screens = createStackNavigator(
@@ -57,6 +58,7 @@ const screens = createStackNavigator(
     Endereco,
     Financeiro,
     Despesas,
+    Lucro,
   },
   {
     defaultNavigationOptions: {

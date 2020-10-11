@@ -15,7 +15,7 @@ import { Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
 const { width } = Dimensions.get("window");
 import apiAgendamento from "../services/apiAgendamento";
-
+import { showLocation } from "react-native-map-link";
 class ServicosDia extends Component {
   state = {
     servsDia: this.props.navigation.state.params.servsDia,
@@ -26,15 +26,20 @@ class ServicosDia extends Component {
     servicoSelected: {
       servico: {},
       cliente: {
-        endereco: {},
+        endereco: null,
       },
+    },
+    options: {
+      latitude: 38.8976763,
+      longitude: -77.0387185,
+      title: "",
+      app: "google-maps",
     },
     loading: false,
   };
 
   componentDidMount() {
     this.setState({ servsDia: this.props.navigation.state.params.servsDia });
-    console.log(this.state.servsDia);
   }
 
   getById = async () => {
@@ -138,6 +143,17 @@ class ServicosDia extends Component {
       });
     }
   };
+
+  openEndereco() {
+    const { servicoSelected, options } = this.state;
+    console.log(servicoSelected.cliente.endereco);
+
+    options.title = `${servicoSelected.cliente.endereco.logradouro}, ${servicoSelected.cliente.endereco.numero}, ${servicoSelected.cliente.endereco.cidade}, ${servicoSelected.cliente.endereco.cep}`;
+
+    console.log(options);
+
+    showLocation(options);
+  }
 
   alertConcluido() {
     Alert.alert(
@@ -263,6 +279,13 @@ class ServicosDia extends Component {
             <Text h2>Status: {servicoSelected.status}</Text>
           </ScrollView>
           <Block middle padding={[theme.sizes.base / 2, 0]}>
+            {servicoSelected.cliente.endereco && (
+              <Button gradient onPress={() => this.openEndereco()}>
+                <Text bold white center>
+                  Endereço do Cliente
+                </Text>
+              </Button>
+            )}
             {servicoSelected.status === "PENDENTE" && (
               <Button gradient onPress={() => this.alertConfirma()}>
                 {loading ? (
@@ -285,17 +308,18 @@ class ServicosDia extends Component {
                 )}
               </Button>
             )}
-            {servicoSelected.status !== "CANCELADO" && (
-              <Button color="accent" onPress={() => this.alertCancela()}>
-                {loading ? (
-                  <ActivityIndicator size="small" color="white" />
-                ) : (
-                  <Text bold white center>
-                    Cancelar
-                  </Text>
-                )}
-              </Button>
-            )}
+            {servicoSelected.status !== "CANCELADO" &&
+              servicoSelected.status !== "CONCLUIDO" && (
+                <Button color="accent" onPress={() => this.alertCancela()}>
+                  {loading ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text bold white center>
+                      Cancelar
+                    </Text>
+                  )}
+                </Button>
+              )}
             <Button
               color="orange"
               onPress={() => this.setState({ showModal: false })}

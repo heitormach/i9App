@@ -19,18 +19,27 @@ import { Picker } from "@react-native-community/picker";
 import moment from "moment";
 import apiTransacao from "../services/apiTransacao";
 const { width } = Dimensions.get("window");
+import { BarChart, Grid, YAxis } from "react-native-svg-charts";
+import * as scale from "d3-scale";
 
 class Despesas extends Component {
   state = {
     despesas: [],
-    despesa: {
-      data_hora_transacao: new Date(),
-      despesa: {
-        descricao: "",
-        nome: "",
-        preco: 0,
-      },
-      tipo: "SAIDA",
+    despesasRelatorio: {
+      quantidade_total: 0,
+      despesas: [
+        {
+          percentual_valor_total: 0,
+          quantidade: 0,
+          despesa: {
+            descricao: "",
+            nome: "",
+            preco: 0,
+          },
+          valor: 0,
+        },
+      ],
+      valor_total: 0,
     },
     meses: [
       { nome: "Janeiro", numero: 1 },
@@ -70,10 +79,10 @@ class Despesas extends Component {
     const { dataInicio, dataFim } = this.state;
 
     this.getDespesas("", dataInicio, dataFim);
+    this.getRelatorioDespesas(dataInicio, dataFim);
   }
 
   setModal = (despesaSelecionada) => {
-    const { despesaSelected } = this.state;
     if (JSON.stringify(despesaSelecionada) === "{}") {
       this.setState({ despesaNova: true });
       this.setState({
@@ -103,6 +112,21 @@ class Despesas extends Component {
     return moment(date).format("YYYY-MM-DD");
   }
 
+  getRelatorioDespesas = async (dataInicio, dataFim) => {
+    try {
+      this.setState({ loading: true });
+      const response = await apiTransacao.get("relatorio/despesa", {
+        dataInicio: this.convertData(dataInicio),
+        dataFim: this.convertData(dataFim),
+      });
+      this.setState({ despesasRelatorio: response.data, loading: false });
+    } catch (err) {
+      console.log(err);
+      Alert.alert("Erro", JSON.stringify(err.data));
+      this.setState({ loading: false });
+    }
+  };
+
   getDespesas = async (status, dataInicio, dataFim) => {
     try {
       this.setState({ loading: true });
@@ -122,7 +146,6 @@ class Despesas extends Component {
 
   saveDespesas = async () => {
     const { despesaSelected, dataInicio, dataFim } = this.state;
-    console.log(JSON.stringify(despesaSelected));
     despesaSelected.data_hora_transacao = moment(
       despesaSelected.data_hora_transacao
     ).format("YYYY-MM-DD HH:mm");
@@ -137,6 +160,7 @@ class Despesas extends Component {
       });
       Alert.alert("Salvo!", "Dados salvos com sucesso.");
       this.getDespesas("", dataInicio, dataFim);
+      this.getRelatorioDespesas(dataInicio, dataFim);
       this.setState({
         despesaSelected: {
           data_hora_transacao: new Date(),
@@ -155,11 +179,57 @@ class Despesas extends Component {
     }
   };
 
+  deleteAlert() {
+    const { despesaSelected } = this.state;
+    Alert.alert(
+      "Excluir Despesa",
+      `Deseja realmente excluir a despesa ${despesaSelected.despesa.nome}?`,
+      [
+        {
+          text: "Não",
+          onPress: () => console.log("Não excluir"),
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          onPress: () => this.deleteDespesa(),
+        },
+      ]
+    );
+  }
+
+  deleteDespesa = async () => {
+    const { despesaSelected, dataInicio, dataFim } = this.state;
+
+    try {
+      this.setState({ loading: true });
+
+      const response = await apiTransacao.delete(
+        "/transacao/despesa/" + despesaSelected.id
+      );
+
+      Alert.alert("Excluído", "Despesa excluída com sucesso!");
+
+      this.setState({ loading: false, showNewDespesa: false });
+
+      this.getDespesas("", dataInicio, dataFim);
+      this.getRelatorioDespesas(dataInicio, dataFim);
+    } catch (err) {
+      Alert.alert("ERRO", JSON.stringify(err.data));
+      console.log(err);
+      this.setState({ loading: false });
+    }
+  };
+
   onChangeMonth(month) {
     this.setState({ mesSelected: month });
     const dateParam = new Date();
     this.getDespesas(
       "",
+      new Date(dateParam.getFullYear(), month - 1, 1),
+      new Date(dateParam.getFullYear(), month, 0)
+    );
+    this.getRelatorioDespesas(
       new Date(dateParam.getFullYear(), month - 1, 1),
       new Date(dateParam.getFullYear(), month, 0)
     );
@@ -176,6 +246,76 @@ class Despesas extends Component {
       }));
     }
   };
+
+  renderChart() {
+    const { despesasRelatorio } = this.state;
+
+    return (
+      <Block row card shadow color="white" style={styles.fats}>
+        <Block
+          style={{ flexDirection: "row", height: 150, paddingVertical: 5 }}
+        >
+          <YAxis
+            data={despesasRelatorio.despesas}
+            yAccessor={({ index }) => index}
+            contentInset={{ top: 10, bottom: 10 }}
+            scale={scale.scaleBand}
+            spacing={0.2}
+            formatLabel={(_, index) =>
+              despesasRelatorio.despesas[index].despesa.nome
+            }
+          />
+          <BarChart
+            style={{ flex: 1, marginLeft: 8 }}
+            data={despesasRelatorio.despesas}
+            horizontal={true}
+            yAccessor={({ item }) => Number(item.percentual_valor_total)}
+            svg={{ fill: theme.colors.primary }}
+            contentInset={{ top: 10, bottom: 10 }}
+            spacing={0.2}
+            gridMin={0}
+          >
+            <Grid direction={Grid.Direction.VERTICAL} />
+          </BarChart>
+        </Block>
+      </Block>
+    );
+  }
+
+  renderTotal() {
+    const { despesasRelatorio } = this.state;
+    return (
+      <Block row card shadow color="#fffcfc" style={styles.fat}>
+        <Block flex={0.25} card column color="orange" style={styles.fatStatus}>
+          <Block flex={0.25} middle center color={theme.colors.accent}>
+            <Text size={10} white style={{ textTransform: "uppercase" }}>
+              TOTAL
+            </Text>
+          </Block>
+          <Block flex={0.7} center middle>
+            <Text h4 white>
+              - R$ {Number(despesasRelatorio.valor_total).toFixed(2)}
+            </Text>
+            <Text h5 white>
+              {despesasRelatorio.quantidade_total}{" "}
+              {despesasRelatorio.quantidade_total > 1 ? "despesas" : "despesa"}
+            </Text>
+          </Block>
+        </Block>
+        <Block flex={0.75} column middle>
+          <Text h4 style={{ paddingVertical: 8 }}>
+            Você tem {despesasRelatorio.quantidade_total}{" "}
+            {despesasRelatorio.quantidade_total > 1 ? "despesas" : "despesa"}{" "}
+            neste mês
+          </Text>
+          <Text h4 style={{ paddingVertical: 8 }}>
+            Valor Total De Despesas: R${" "}
+            {Number(despesasRelatorio.valor_total).toFixed(2)}
+          </Text>
+        </Block>
+      </Block>
+    );
+  }
 
   renderSelectedDespesa() {
     const {
@@ -348,7 +488,7 @@ class Despesas extends Component {
             Descrição: {despesa.despesa.descricao}
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Valor: R$ {Number(despesa.despesa.preco).toFixed(2)}
+            Valor: R$ {despesa.despesa.preco.toFixed(2)}
           </Text>
         </Block>
       </Block>
@@ -356,11 +496,11 @@ class Despesas extends Component {
   }
 
   renderDespesas() {
-    const { navigation } = this.props;
     const { despesas } = this.state;
     return (
       <Block flex={0.8} column style={styles.agends}>
         <SafeAreaView style={styles.safe}>
+          {despesas.length > 0 && this.renderTotal()}
           {despesas.map((despesa) => (
             <TouchableOpacity
               onPress={() => this.setModal(despesa)}
@@ -393,7 +533,7 @@ class Despesas extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { meses, mesSelected, loading } = this.state;
+    const { meses, mesSelected, loading, despesas } = this.state;
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -425,11 +565,9 @@ class Despesas extends Component {
           </Picker>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
-          {loading ? (
-            <ActivityIndicator size="large" color="green" />
-          ) : (
-            this.renderDespesas()
-          )}
+          {loading === true && <ActivityIndicator size="large" color="green" />}
+          {loading === false && despesas.length > 0 && this.renderChart()}
+          {loading === false && this.renderDespesas()}
         </ScrollView>
         <TouchableOpacity onPress={() => this.setModal({})} style={styles.fab}>
           <Text style={styles.fabIcon}>+</Text>
@@ -521,5 +659,23 @@ const styles = StyleSheet.create({
   },
   inputRow: {
     alignItems: "flex-end",
+  },
+  fat: {
+    padding: 20,
+    marginBottom: 15,
+  },
+  fatStatus: {
+    marginRight: 20,
+    overflow: "hidden",
+    height: 90,
+  },
+  safe: {
+    flex: 1,
+  },
+  fats: {
+    marginTop: -55,
+    paddingTop: 55 + 20,
+    paddingHorizontal: 15,
+    zIndex: -1,
   },
 });

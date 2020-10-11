@@ -1,3 +1,4 @@
+const apiKey = "AIzaSyCWek3uRhvxP2ZRQhgMe5WwjMkJ1ypq39o";
 const categories = [
   {
     id: "servicos",
@@ -38,14 +39,6 @@ const categories = [
     screen: "Estudo",
     count: 47,
     image: require("../assets/icons/estudo.png"),
-  },
-  {
-    id: "ajuda",
-    name: "Ajuda",
-    tags: ["menu"],
-    screen: "Ajuda",
-    count: 47,
-    image: require("../assets/icons/ajuda.png"),
   },
 ];
 
