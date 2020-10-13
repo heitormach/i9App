@@ -33,7 +33,9 @@ class ServicosDia extends Component {
       latitude: 38.8976763,
       longitude: -77.0387185,
       title: "",
-      app: "google-maps",
+      dialogTitle: "Deseja abrir em qual aplicativo?",
+      dialogMessage: "",
+      cancelText: "Cancelar",
     },
     loading: false,
   };
@@ -146,11 +148,17 @@ class ServicosDia extends Component {
 
   openEndereco() {
     const { servicoSelected, options } = this.state;
-    console.log(servicoSelected.cliente.endereco);
 
-    options.title = `${servicoSelected.cliente.endereco.logradouro}, ${servicoSelected.cliente.endereco.numero}, ${servicoSelected.cliente.endereco.cidade}, ${servicoSelected.cliente.endereco.cep}`;
-
-    console.log(options);
+    options.dialogMessage = `Endereço:\n${
+      servicoSelected.cliente.endereco.logradouro
+    }, ${servicoSelected.cliente.endereco.numero}, ${
+      servicoSelected.cliente.endereco.cidade
+    }, ${servicoSelected.cliente.endereco.uf}, ${
+      servicoSelected.cliente.endereco.complemento
+        ? servicoSelected.cliente.endereco.complemento + ","
+        : ""
+    } ${servicoSelected.cliente.endereco.cep}`;
+    options.title = `${servicoSelected.cliente.endereco.logradouro}, ${servicoSelected.cliente.endereco.numero}, ${servicoSelected.cliente.endereco.cidade}, ${servicoSelected.cliente.endereco.uf}, ${servicoSelected.cliente.endereco.cep}`;
 
     showLocation(options);
   }

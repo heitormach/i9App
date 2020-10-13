@@ -6,9 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
+  SafeAreaView,
 } from "react-native";
 
-import { Card, Badge, Button, Block, Text } from "../components";
+import { Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
 import { estudos } from "../constants/mocks";
 const { width } = Dimensions.get("window");
@@ -126,31 +127,29 @@ class Estudo extends Component {
           {tabs.map((tab) => this.renderTab(tab))}
         </Block>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ paddingVertical: theme.sizes.base * 2 }}
-        >
-          <Block flex={false} row space="between" style={styles.estudos}>
-            {estudos.map((estudo) => (
-              <TouchableOpacity
-                key={estudo.nome}
-                onPress={() => {
-                  this.setState({ estudoSelected: estudo, showEstudo: true });
-                }}
-              >
-                <Card
-                  center
-                  middle
-                  color="#fffcfc"
-                  shadow
-                  style={styles.estudo}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <Block flex={false} row space="between" style={styles.agends}>
+            <SafeAreaView style={styles.safe}>
+              {estudos.map((estudo) => (
+                <TouchableOpacity
+                  key={estudo.nome}
+                  onPress={() => {
+                    this.setState({ estudoSelected: estudo, showEstudo: true });
+                  }}
                 >
-                  <Text center medium height={20}>
-                    {estudo.nome}
-                  </Text>
-                </Card>
-              </TouchableOpacity>
-            ))}
+                  <Block row card shadow color="#fffcfc" style={styles.agend}>
+                    <Block flex={0.75} column middle>
+                      <Text h3 style={{ paddingVertical: 8 }}>
+                        {estudo.nome}
+                      </Text>
+                      <Text h4 style={{ paddingVertical: 8 }}>
+                        {estudo.titulo}
+                      </Text>
+                    </Block>
+                  </Block>
+                </TouchableOpacity>
+              ))}
+            </SafeAreaView>
           </Block>
         </ScrollView>
         {this.renderEstudo()}
@@ -193,10 +192,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.sizes.base * 2,
     marginBottom: theme.sizes.base * 3.5,
   },
+  agends: {
+    marginTop: -55,
+    paddingTop: 55 + 20,
+    paddingHorizontal: 15,
+    zIndex: -1,
+  },
+  agend: {
+    padding: 20,
+    marginBottom: 15,
+  },
   estudo: {
     // this should be dynamic based on screen width
     minWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
     maxWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
     maxHeight: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
+  },
+  safe: {
+    flex: 1,
   },
 });

@@ -22,7 +22,7 @@ import apiTransacao from "../services/apiTransacao";
 
 class Lucro extends Component {
   state = {
-    lucros: {},
+    lucros: [],
     usuario: {},
     meses: [
       { nome: "Janeiro", numero: 1 },
@@ -39,8 +39,8 @@ class Lucro extends Component {
       { nome: "Dezembro", numero: 12 },
     ],
     mesSelected: new Date().getMonth() + 1,
-    dataInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-    dataFim: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+    dataInicio: "2020-01-01",
+    dataFim: "2020-12-31",
     loading: false,
   };
 
@@ -60,8 +60,8 @@ class Lucro extends Component {
     try {
       this.setState({ loading: true });
       const response = await apiTransacao.get("relatorio/lucro", {
-        dataInicio: this.convertData(dataInicio),
-        dataFim: this.convertData(dataFim),
+        dataInicio: "2020-01-01",
+        dataFim: "2020-12-31",
       });
 
       this.setState({ lucros: response.data });
@@ -72,19 +72,6 @@ class Lucro extends Component {
       this.setState({ loading: false });
     }
   };
-
-  onChangeMonth(month) {
-    this.setState({ mesSelected: month });
-    const dateParam = new Date();
-    this.getTransacao(
-      new Date(dateParam.getFullYear(), month - 1, 1),
-      new Date(dateParam.getFullYear(), month, 0)
-    );
-  }
-
-  selectWeekDay(lucro) {
-    this.setState({ lucroSelected: lucro, showWeek: true });
-  }
 
   componentDidMount() {
     //  this.setState({ agends: this.props.agends });
@@ -108,7 +95,7 @@ class Lucro extends Component {
         >
           <Block flex={0.25} middle center color={theme.colors.primary}>
             <Text size={10} white style={{ textTransform: "uppercase" }}>
-              Lucro
+              {lucro.mes}
             </Text>
           </Block>
           <Block flex={0.7} center middle>
@@ -119,13 +106,13 @@ class Lucro extends Component {
         </Block>
         <Block flex={0.75} column middle>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Faturamentos:       R$ {Number(lucro.faturamentos).toFixed(2)}
+            Faturamentos: R$ {Number(lucro.faturamentos).toFixed(2)}
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Despesas:            - R$ {Number(lucro.despesas).toFixed(2)}
+            Despesas: - R$ {Number(lucro.despesas).toFixed(2)}
           </Text>
           <Text h4 style={{ paddingVertical: 8 }}>
-            Lucro:                      R$ {Number(lucro.lucro).toFixed(2)}
+            Lucro: R$ {Number(lucro.lucro).toFixed(2)}
           </Text>
           <Text caption semibold></Text>
         </Block>
@@ -139,10 +126,12 @@ class Lucro extends Component {
     return (
       <Block flex={0.8} column style={styles.fats}>
         <SafeAreaView style={styles.safe}>
-          <TouchableOpacity activeOpacity={0.8}>
-            {this.renderLucro(lucros)}
-          </TouchableOpacity>
-          {!lucros && (
+          {lucros.map((lucro) => (
+            <TouchableOpacity key={lucro.mes} activeOpacity={0.8}>
+              {this.renderLucro(lucro)}
+            </TouchableOpacity>
+          ))}
+          {lucros.length === 0 && (
             <Block>
               <Text style={{ marginBottom: 50 }} center medium height={20}>
                 Aqui você pode ver o lucro mensal do seu negócio, baseado nos
@@ -171,26 +160,6 @@ class Lucro extends Component {
           <Button onPress={() => navigation.navigate("Settings")}>
             <Image source={profile.avatar} style={styles.avatar} />
           </Button>
-        </Block>
-        <Block flex={false} row space="between" style={styles.fatsHeader}>
-          <Picker
-            style={{
-              height: 50,
-              width: 200,
-              transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],
-            }}
-            selectedValue={mesSelected}
-            onValueChange={(v) => this.onChangeMonth(v)}
-            itemStyle={{ fontSize: 20 }}
-          >
-            {meses.map((mes) => (
-              <Picker.Item
-                key={`mes-${mes.nome}`}
-                label={mes.nome}
-                value={mes.numero}
-              />
-            ))}
-          </Picker>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>
           {loading === true && <ActivityIndicator size="large" color="green" />}

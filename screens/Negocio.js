@@ -63,6 +63,7 @@ class Negocio extends Component {
         cpf_proprietario: negocio.cpf_proprietario,
         cnpj: negocio.cnpj,
         atendimento_domiciliar: negocio.atendimento_domiciliar,
+        segmento: negocio.segmento,
       });
       this.setState({ loading: false });
       Alert.alert("Salvo!", "Dados salvos com sucesso.");
@@ -104,6 +105,19 @@ class Negocio extends Component {
                       negocio: {
                         ...prev.negocio,
                         nome: text,
+                      },
+                    }))
+                  }
+                />
+                <Input
+                  label="Tipo do Negócio (Ex: Barbearia, Marcenaria, etc)"
+                  style={[styles.input]}
+                  defaultValue={negocio.segmento}
+                  onChangeText={(text) =>
+                    this.setState((prev) => ({
+                      negocio: {
+                        ...prev.negocio,
+                        segmento: text,
                       },
                     }))
                   }
