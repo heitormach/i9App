@@ -460,6 +460,101 @@ const estudos = [
       },
     ],
   },
+  {
+    nome: "Marketing",
+    titulo: "4 práticas de marketing que todo empreendedor deveria saber",
+    conteudo: [
+      {
+        subTitulo: "",
+        paragrafos: [
+          "Sabemos que um empreendedor precisa lidar com muitas tarefas em seu dia a dia, principalmente no início do negócio, já que ele é o responsável por diversas áreas.",
+          "Isso faz com que o seu tempo fique muito dividido e a sua rotina seja extremamente intensa e corrida. Nesse sentido, pode ser que alguns setores ganhem mais atenção do que outros, dependendo das suas prioridades e do próprio perfil de quem está empreendendo.",
+          "Mas há algumas delas que são essenciais para que o negócio possa caminhar bem.Uma delas é o marketing. Ele é essencial para interagir com o seu público-alvo, trazer novos clientes e manter os antigos confiantes no seu serviço ou produto.",
+          "Por isso, é importante que o dono do negócio esteja inteirado sobre o que há de novo nessa área, além de ferramentas e metodologias que já estão consolidadas no mercado. Então, listamos aqui 7 práticas de marketing que todo empreendedor deveria saber. Confira:",
+        ],
+      },
+      {
+        subTitulo: "1. Construção da marca",
+        paragrafos: [
+          "Todo empreendedor possui um ideal ao criar um negócio. Então, é preciso utilizar essa motivação para construir uma marca que seja sólida e comprometida com seus clientes. Independente do tamanho e do setor da empresa, é fundamental que ela transmita credibilidade para que as pessoas acreditem no seu trabalho.",
+          "Afinal, o empreendedor é a “cara” da empresa, ou seja, precisa ser a pessoa mais capacitada para garantir que o negócio tenha uma imagem positiva e, assim, tornar-se referência no que faz.",
+        ],
+      },
+      {
+        subTitulo: "2. Conhecimento do seu público-alvo",
+        paragrafos: [
+          "É preciso conhecer quem é o seu público-alvo e definir quem poderá ser o seu futuro cliente.",
+          "O público-alvo é algo mais genérico e portanto mais fácil de definir. Ele nada mais é do que um grupo de pessoas que possui as mesmas características que se encaixam no público que pode utilizar o seu produto ou serviço em algum momento da vida. Por exemplo: Gerentes de Marketing, de 25 a 35 anos, com renda média de R$5 mil.",
+        ],
+      },
+      {
+        subTitulo: "3. Marketing de divulgação e venda",
+        paragrafos: [
+          'Saber divulgar e vender o seu produto também é uma das práticas de marketing que deve estar na lista de "conhecimento obrigatório" para todo empreendedor. O motivo para isso é simples: se o empreendedor não sabe divulgar e vender o seu produto, quem saberá?',
+          "Portanto, é preciso que ele entenda que esse assunto deve ser uma das principais prioridades em sua rotina. Sendo assim, ele deve definir ações que sejam objetivas e implementá-las ao longo de sua jornada empreendedora.",
+        ],
+      },
+      {
+        subTitulo: "4. Experiência e engajamento do cliente",
+        paragrafos: [
+          "Quando chegamos no ponto da experiência do cliente é possível desenvolver estratégias que atendam às suas necessidades. Isso vai melhorar a sua experiência de compra ao levar em consideração a sua jornada de compra.",
+          "Então, é preciso entender como ele se sente e o que pode ser benéfico para ele. Assim, a sua marca consegue agregar valor logo no início desse relacionamento e por toda a sua vida.",
+          "Existem diversas estratégias e boas práticas para fazer isso. Podemos citar as redes sociais como uma ferramenta importante para entender o engajamento do cliente. Pelo Facebook e Instagram, por exemplo, é possível saber o quanto ele acompanha a empresa, compartilha e interage com seus conteúdos.",
+          "Fazendo esse levantamento você desenvolve cada vez mais ações que podem trabalhar a aproximação constante do cliente com a sua marca.",
+        ],
+      },
+    ],
+  },
+  {
+    nome: "Lucro",
+    titulo: "3 passos para aumentar os lucros da sua empresa",
+    conteudo: [
+      {
+        subTitulo: "",
+        paragrafos: [
+          "Como aumentar o lucro da empresa? Se a sua resposta é somente aumentar as vendas, você está prestes a cometer um erro comum. Muitos gestores acreditam que ter mais lucro é igual a entrar mais dinheiro! É óbvio que fazer mais negócios é parte considerável do faturamento, porém tão importante quanto isso é sair menos dinheiro dos seus cofres.",
+          "Ou seja, uma das estratégias para manter o seu fluxo de caixa positivo é diminuir os custos das suas operações. Desta forma, seus lucros vão crescer mesmo que você mantenha o mesmo número de negociações. Além disso, é uma boa ideia investir em programas, treinamentos e outras iniciativas que você verá agora.",
+          "Saiba, a seguir, como aumentar os seus lucros e garantir o sucesso a longo prazo da sua companhia.",
+        ],
+      },
+      {
+        subTitulo: "1. Tenha controle sobre as despesas",
+        paragrafos: [
+          "Quanto custa para sua empresa o uso mensal de água? E os gastos com materiais de limpeza? Se você não tem na ponta da língua essas respostas, falta-lhe algo essencial para aumentar os lucros da sua empresa: controle.",
+          "Manter o domínio sobre o orçamento de todos os setores é primordial para a saúde financeira de qualquer organização. Somente por meio do monitoramento constante, você será capaz de identificar onde o gasto é maior e o que pode ser feito para reduzi-lo. No início, esse levantamento significa muito trabalho, mas depois será uma ferramenta incrível para aumentar o faturamento.",
+        ],
+      },
+      {
+        subTitulo: "2. Separe as contas",
+        paragrafos: [
+          "Todo o lucro da empresa pertence a você? Claro que não! Não é porque a empresa é sua que todo dinheiro vai direto para o seu bolso! Para ter mais lucro é necessário separar as contas pessoais das empresariais.",
+          "Na prática, você tem que ter contas bancárias separadas e manter os débitos do dia a dia independentes. A parcela do seu carro novo não deve estar na programação financeira da empresa está errado, por exemplo. Ou se a fatura das passagens aéreas das suas férias vai direto para o setor de compras, também não funciona. Para evitar essa confusão, mantenha um pró-labore que varie de acordo com o faturamento da organização.",
+        ],
+      },
+      {
+        subTitulo: "3. Trate bem o cliente",
+        paragrafos: [
+          "Já passou o tempo em que os clientes ficavam presos à marca somente por tradição ou por não existir outras opções. Atualmente, o cliente é fiel à qualidade do produto e preço. Há alguns que também se preocupam com a responsabilidade social da marca e até questões de sustentabilidade entram na balança.",
+          "Logo, é requisito básico tratar bem o cliente, atender as suas necessidades e ir além no pós-venda. SAC que não funciona, vendedor que não escuta ou empresa que só quer aumentar os lucros não conseguem se sustentar por muito tempo. Atendimento é tudo.",
+        ],
+      },
+    ],
+  },
+  {
+    nome: "Negociação",
+    titulo: "Técnicas de Negociação",
+    conteudo: [
+      {
+        subTitulo: "",
+        paragrafos: [
+          "Aprender técnicas de negociação é um conhecimento útil não apenas para vendedores, mas também para todo empreendedor.Aliás, é válido para qualquer profissional, mesmo que seu job description não inclua fechar negócios com stakeholders da empresa onde trabalha.Porque negociar não é apenas assinar um contrato de compra ou venda de produtos ou serviços.",
+          "Negociar também é chegar a um denominador comum em uma questão específica e, por vezes, controversa.É encontrar uma maneira de resolver um conflito, fazer com que o outro aja de determinada maneira – sempre no sentido dos interesses da empresa, é claro.As técnicas de negociação, portanto, servem para qualquer um que lida com pessoas, sejam elas subordinadas ou do mesmo nível hierárquico.",
+          "Mas é claro que são ainda mais importantes para aqueles que lidam diretamente com possíveis clientes e fornecedores.Em um mercado tão instável, deve-se agarrar qualquer chance de obter uma condição melhor no negócio, seja para reduzir custos ou aumentar a margem de lucro.",
+          "No caso de quem está vendendo, é importante observar que as técnicas de negociação são a ponta final do trabalho para alcançar esse objetivo.Isso quer dizer que, antes de negociar, é preciso se certificar de que o serviço ou produto oferecido corresponde às expectativas do possível cliente.",
+        ],
+      },
+    ],
+  },
 ];
 
 const planos = [
