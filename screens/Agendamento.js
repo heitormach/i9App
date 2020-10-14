@@ -22,7 +22,6 @@ import apiNegocio from "../services/apiNegocio";
 import { AsyncStorage } from "react-native";
 import apiEndereco from "../services/apiEndereco";
 
-
 class Agendamento extends Component {
   state = {
     agendamentos: [],
@@ -626,6 +625,7 @@ class Agendamento extends Component {
   }
 
   renderAgend(agend) {
+    console.log(new Date(agend.data_agendamento.substring(0, 10)).getUTCDate());
     return (
       <Block row card shadow color="#fffcfc" style={styles.agend}>
         <Block
@@ -642,7 +642,7 @@ class Agendamento extends Component {
           </Block>
           <Block flex={0.7} center middle>
             <Text h2 white>
-              {new Date(agend.data_agendamento.substring(0, 10)).getDate() + 1}
+              {new Date(agend.data_agendamento.substring(0, 10)).getUTCDate()}
             </Text>
           </Block>
         </Block>

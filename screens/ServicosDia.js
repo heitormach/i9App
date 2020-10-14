@@ -26,7 +26,7 @@ class ServicosDia extends Component {
     servicoSelected: {
       servico: {},
       cliente: {
-        endereco: null,
+        endereco: {},
       },
     },
     options: {
@@ -270,8 +270,8 @@ class ServicosDia extends Component {
           space="between"
         >
           <Text h1 light>
-            {servicoSelected.servico.nome} - {dataCorrect.getDate() + 1}/
-            {dataCorrect.getMonth() + 1}
+            {servicoSelected.servico.nome} - {dataCorrect.getUTCDate()}/
+            {dataCorrect.getUTCMonth() + 1}
           </Text>
           <ScrollView style={{ marginVertical: theme.sizes.padding }}>
             <Text h2 light style={{ marginBottom: theme.sizes.base }}>
@@ -287,7 +287,7 @@ class ServicosDia extends Component {
             <Text h2>Status: {servicoSelected.status}</Text>
           </ScrollView>
           <Block middle padding={[theme.sizes.base / 2, 0]}>
-            {servicoSelected.cliente.endereco && (
+            {servicoSelected.cliente.endereco.cep && (
               <Button gradient onPress={() => this.openEndereco()}>
                 <Text bold white center>
                   Endereço do Cliente
@@ -379,7 +379,7 @@ class ServicosDia extends Component {
         </Block>
         <Block flex={false} row space="between" style={styles.servHeader}>
           <Text h1 light>
-            Agenda - {dataCorrect.getDate() + 1}/{dataCorrect.getMonth() + 1}
+            Agenda - {dataCorrect.getUTCDate()}/{dataCorrect.getUTCMonth() + 1}
           </Text>
         </Block>
         <ScrollView showsHorizontalScrollIndicator={false}>

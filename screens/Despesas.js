@@ -476,7 +476,7 @@ class Despesas extends Component {
             <Text h2 white>
               {new Date(
                 String(despesa.data_hora_transacao).substring(0, 10)
-              ).getDate()}
+              ).getUTCDate()}
             </Text>
           </Block>
         </Block>
