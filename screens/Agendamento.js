@@ -80,6 +80,7 @@ class Agendamento extends Component {
       "TO",
     ],
     mesSelected: new Date().getMonth() + 1,
+    mesVolta: "",
     servicos: [],
     servicoSelected: {},
     diaSelected: moment(new Date()).format("DD/MM/YYYY"),
@@ -96,17 +97,16 @@ class Agendamento extends Component {
 
   componentDidMount() {
     //  this.setState({ agends: this.props.agends });
-    const { dataInicio, dataFim } = this.state;
+    const { dataInicio, dataFim, mesVolta } = this.state;
     const { navigation } = this.props;
 
     this.getAgendamentos("", dataInicio, dataFim);
     this.getServicos();
-
-    navigation.addListener("willFocus", () => {
-      this.getAgendamentos("", dataInicio, dataFim);
-      this.getServicos();
-    });
   }
+
+  refreshGoBack = (data) => {
+    this.onChangeMonth(data.getMonth() + 1);
+  };
 
   convertData(date) {
     return moment(date).format("YYYY-MM-DD");
@@ -276,7 +276,7 @@ class Agendamento extends Component {
   }
 
   onChangeMonth(month) {
-    this.setState({ mesSelected: month });
+    this.setState({ mesSelected: month, mesVolta: month });
     const dateParam = new Date();
     this.getAgendamentos(
       "",
@@ -625,7 +625,6 @@ class Agendamento extends Component {
   }
 
   renderAgend(agend) {
-    console.log(new Date(agend.data_agendamento.substring(0, 10)).getUTCDate());
     return (
       <Block row card shadow color="#fffcfc" style={styles.agend}>
         <Block
@@ -667,7 +666,10 @@ class Agendamento extends Component {
           {agendamentos.map((agend) => (
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate("ServicosDia", { servsDia: agend })
+                navigation.navigate("ServicosDia", {
+                  onGoBack: this.refreshGoBack,
+                  servsDia: agend,
+                })
               }
               activeOpacity={0.8}
               key={`agend-${agend.data_agendamento}`}

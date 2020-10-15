@@ -25,15 +25,17 @@ export default class Login extends Component {
   handleLogin = async () => {
     const { navigation } = this.props;
     const { login, senha, tipo_usuario } = this.state;
+
+    const token_notificacao = await AsyncStorage.getItem("@i9App:expoToken");
+
     try {
       this.setState({ loading: true });
 
-      const response = await apiUsuario.post("/usuarios/token", null, {
-        params: {
-          login: login,
-          senha: senha,
-          tipo_usuario: tipo_usuario,
-        },
+      const response = await apiUsuario.post("/usuarios/token", {
+        login: login,
+        senha: senha,
+        tipo_usuario: tipo_usuario,
+        token_notificacao: token_notificacao,
       });
 
       await AsyncStorage.multiSet([

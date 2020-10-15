@@ -44,6 +44,7 @@ export default class SignUp extends Component {
     ind_whatsapp: false,
     nome_completo: "",
     tipo_usuario: "PRESTADOR",
+    token_notificacao: "",
     show: false,
     mode: "date",
     loading: false,
@@ -79,16 +80,18 @@ export default class SignUp extends Component {
 
   handleLogin = async () => {
     const { navigation } = this.props;
-    const { dados_login, tipo_usuario } = this.state;
+    const { dados_login, tipo_usuario, token_notificacao } = this.state;
+
+    token_notificacao = await AsyncStorage.getItem("@i9App:expoToken");
+
     try {
       this.setState({ loading: true });
 
-      const response = await apiUsuario.post("/usuarios/token", null, {
-        params: {
-          login: dados_login.login,
-          senha: dados_login.senha,
-          tipo_usuario: tipo_usuario,
-        },
+      const response = await apiUsuario.post("/usuarios/token", {
+        login: dados_login.login,
+        senha: dados_login.senha,
+        tipo_usuario: tipo_usuario,
+        token_notificacao: token_notificacao,
       });
 
       await AsyncStorage.multiSet([

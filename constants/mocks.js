@@ -563,7 +563,7 @@ const planos = [
     nome: "i9Mentor",
     preco: 0.0,
     descricao:
-      "- Acesso às funcionalidades de gestão de caixa\n\n- Serviço de Agendamento\n\n- Relatório mensal do fluxo de caixa (Entrada-Saída)\n\n- Visão anual de P&L do negócio\n\n- Acesso ao material de estudo\n\n- Estratégia de marketing (Em breve)\n\n- Taxa por serviço (10% limitado a R$100,00)",
+      "- Acesso às funcionalidades de gestão de caixa\n\n- Serviço de Agendamento\n\n- Relatório mensal do fluxo de caixa (Entrada-Saída)\n\n- Visão anual de P&L do negócio\n\n- Acesso ao material de estudo\n\n- Taxa por serviço (10% limitado a R$100,00)",
   },
   {
     id: 2,

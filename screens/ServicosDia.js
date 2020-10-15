@@ -38,10 +38,15 @@ class ServicosDia extends Component {
       cancelText: "Cancelar",
     },
     loading: false,
+    dataCorret: "",
   };
 
   componentDidMount() {
+    const { servsDia } = this.state;
+    const { navigation } = this.props;
     this.setState({ servsDia: this.props.navigation.state.params.servsDia });
+    const dataCorrect = new Date(servsDia.data_agendamento.substring(0, 10));
+    navigation.state.params.onGoBack(dataCorrect);
   }
 
   getById = async () => {
@@ -233,7 +238,7 @@ class ServicosDia extends Component {
             <Text h2 white>
               {serv.data_hora.substring(11, 16)}
             </Text>
-            <Text size={13} white>
+            <Text size={10} white>
               {serv.status}
             </Text>
           </Block>
@@ -255,7 +260,10 @@ class ServicosDia extends Component {
 
   renderModal() {
     const { servicoSelected, servsDia, loading } = this.state;
+    const { navigation } = this.props;
+
     const dataCorrect = new Date(servsDia.data_agendamento.substring(0, 10));
+    navigation.state.params.onGoBack(dataCorrect);
     const horaCorrect = servicoSelected.data_hora
       ? servicoSelected.data_hora.substring(11, 16)
       : "00:00";
@@ -367,6 +375,7 @@ class ServicosDia extends Component {
     const { profile, navigation } = this.props;
     const { servsDia } = this.state;
     const dataCorrect = new Date(servsDia.data_agendamento.substring(0, 10));
+    navigation.state.params.onGoBack(dataCorrect);
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
