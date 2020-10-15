@@ -105,7 +105,8 @@ class Agendamento extends Component {
   }
 
   refreshGoBack = (data) => {
-    this.onChangeMonth(data.getMonth() + 1);
+    console.log(data.getUTCMonth());
+    this.onChangeMonth(data.getUTCMonth() + 1);
   };
 
   convertData(date) {

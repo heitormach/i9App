@@ -213,6 +213,13 @@ class Settings extends Component {
             <Block style={styles.inputs}>
               {!alteraSenha ? (
                 <Block>
+                  {usuario.plano_contratado && (
+                    <Block style={{ marginBottom: 10 }}>
+                      <Text gray2>Plano Contratado</Text>
+                      <Text>{usuario.plano_contratado}</Text>
+                    </Block>
+                  )}
+
                   <Text gray2>E-mail</Text>
                   <Text>{usuario.contato.email}</Text>
 
@@ -231,9 +238,7 @@ class Settings extends Component {
                   <Block>
                     <Text gray2>Data de Nascimento</Text>
                     <Text>
-                      {moment(new Date(usuario.data_nascimento)).format(
-                        "DD/MM/YYYY"
-                      )}
+                      {moment(usuario.data_nascimento).format("DD/MM/YYYY")}
                     </Text>
                   </Block>
                   <Input

@@ -9,6 +9,7 @@ import {
   Modal,
   Alert,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 
 import { Button, Block, Text } from "../components";
@@ -285,6 +286,20 @@ class ServicosDia extends Component {
             <Text h2 light style={{ marginBottom: theme.sizes.base }}>
               Cliente: {servicoSelected.cliente.nome}
             </Text>
+            {servicoSelected.cliente.contato && (
+              <TouchableOpacity
+                onPress={() =>
+                  Linking.openURL(
+                    `tel:${servicoSelected.cliente.contato.ddd}${servicoSelected.cliente.contato.numero}`
+                  )
+                }
+              >
+                <Text h3 style={{ paddingVertical: 8 }}>
+                  Contato: {servicoSelected.cliente.contato.celular.ddd} -{" "}
+                  {servicoSelected.cliente.contato.celular.numero}
+                </Text>
+              </TouchableOpacity>
+            )}
             <Text h2>Descrição do Serviço:</Text>
             <Text h3 light style={{ marginBottom: theme.sizes.base }}>
               {servicoSelected.servico.descricao}

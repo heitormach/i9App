@@ -67,6 +67,10 @@ export default class App extends React.Component {
     });
   };
 
+  getToken = async () => {
+    console.log(await AsyncStorage.getItem("@i9App:token"));
+  };
+
   handleResourcesAsync = async () => {
     // we're caching all the images
     // for better performance on the app
@@ -79,6 +83,7 @@ export default class App extends React.Component {
   };
 
   render() {
+    this.getToken();
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
       return (
         <AppLoading

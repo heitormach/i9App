@@ -60,8 +60,8 @@ class FatAnual extends Component {
       "2020",
     ],
     anoSelected: String(new Date().getFullYear()),
-    dataInicio: new Date(new Date().getFullYear(), 1, 1),
-    dataFim: new Date(new Date().getFullYear(), 12, 31),
+    dataInicio: new Date(new Date().getFullYear(), 0, 1),
+    dataFim: new Date(new Date().getFullYear(), 11, 31),
     loading: false,
   };
 
@@ -76,6 +76,7 @@ class FatAnual extends Component {
   }
 
   convertData(date) {
+    console.log(date);
     return moment(date).format("YYYY-MM-DD");
   }
 
@@ -94,7 +95,7 @@ class FatAnual extends Component {
       this.setState({ faturamentos: response.data });
       this.setState({ loading: false });
     } catch (err) {
-      //console.log(err);
+      console.log(err);
       Alert.alert("Erro", JSON.stringify(err.data));
       this.setState({ loading: false });
     }
